@@ -1,26 +1,29 @@
 /**
  * [INPUT]: BgmArchetype, target duration, target BPM range
  * [OUTPUT]: BgmAsset (mp3 path + BPM + first-beat offset)
- * [POS]: scripts/ pipeline 第 [5] 步; royalty-free BGM 抓取 + BPM 检测
+ * [POS]: scripts/ pipeline 第 [5] 步; royalty-free BGM 抓取 + BPM 检测 + 裁剪
  * [PROTOCOL]: 变更时更新此头部，然后检查 SKILL.md
  */
 
 // ================================================================
 //  BGM Fetcher
 //
-//  Strategy:
-//    1. Maintain a small royalty-free pool indexed by archetype + BPM
-//    2. If pool insufficient, use yt-dlp to grab from royalty-free YouTube channels
-//    3. Run aubiotrack for BPM + first-beat offset
-//    4. Trim / loop to target duration with ffmpeg
+//  Strategy per archetype:
+//    1. Build a curated yt-dlp search query targeting known
+//       royalty-free channels (NoCopyrightSounds, Lofi Girl,
+//       Audionautix, etc.)
+//    2. Download top N candidates (audio only)
+//    3. Run aubiotrack to detect BPM + first beat offset
+//    4. Pick the candidate with BPM closest to archetype target
+//    5. ffmpeg trim or loop-with-crossfade to exact target duration
 //
-//  This module is a STUB. Full implementation requires:
-//    - Local royalty-free pool curated separately
-//    - yt-dlp installed
-//    - aubiotrack installed (port from remotion-video/scripts/beat-sync.ts)
-//    - ffmpeg installed
+//  Requires: yt-dlp, aubiotrack, ffmpeg in PATH.
 // ================================================================
 
+import { execFileSync, spawnSync } from "child_process";
+import { existsSync, mkdtempSync, readdirSync, statSync } from "fs";
+import { tmpdir } from "os";
+import { dirname, join } from "path";
 import type { BgmArchetype, BgmAsset } from "./types.ts";
 
 export interface BgmFetchOptions {
@@ -28,18 +31,11 @@ export interface BgmFetchOptions {
   durationSeconds: number;
   outputPath: string;
   preferredBpmRange?: [number, number];
-}
-
-interface BgmCandidate {
-  source: "pool" | "yt-dlp";
-  reference: string; // file path or YouTube URL
-  bpm?: number;
-  archetype: BgmArchetype;
-  label?: string;
+  candidateCount?: number;
 }
 
 // ----------------------------------------------------------------
-//  BPM ranges per archetype (from style-dimensions.md)
+//  BPM ranges per archetype (matches style-dimensions.md)
 // ----------------------------------------------------------------
 
 const BPM_RANGES: Record<BgmArchetype, [number, number]> = {
@@ -52,45 +48,309 @@ const BPM_RANGES: Record<BgmArchetype, [number, number]> = {
   "speech-only": [0, 0],
 };
 
+// Curated yt-dlp search queries per archetype.
+// Targets known royalty-free YouTube channels. Adding "no copyright"
+// and "instrumental" filters out vocal hooks that fight VO.
+const SEARCH_QUERIES: Record<BgmArchetype, string> = {
+  "minimalist-ambient":
+    "NoCopyrightSounds ambient chill instrumental no copyright",
+  "techno-driving":
+    "NoCopyrightSounds electronic upbeat instrumental no copyright",
+  "cinematic-orchestral":
+    "Audionautix cinematic epic instrumental no copyright",
+  "hip-hop-confident":
+    "NoCopyrightSounds hip hop instrumental no copyright",
+  "lo-fi-warm": "Lofi Girl chill beats lofi instrumental",
+  "silence-with-sfx": "",
+  "speech-only": "",
+};
+
 export function getBpmRange(archetype: BgmArchetype): [number, number] {
   return BPM_RANGES[archetype];
 }
 
-export function getBpmTarget(archetype: BgmArchetype, override?: [number, number]): number {
+export function getBpmTarget(
+  archetype: BgmArchetype,
+  override?: [number, number]
+): number {
   const [min, max] = override ?? BPM_RANGES[archetype];
   return Math.round((min + max) / 2);
 }
 
-// ----------------------------------------------------------------
-//  Main fetcher (STUB)
-// ----------------------------------------------------------------
-
-export async function fetchBgm(opts: BgmFetchOptions): Promise<BgmAsset> {
-  if (opts.archetype === "silence-with-sfx" || opts.archetype === "speech-only") {
-    throw new Error(
-      `fetchBgm called with non-music archetype "${opts.archetype}". ` +
-        `These archetypes require SFX or VO-only — not BGM fetch.`
-    );
-  }
-
-  const target = getBpmTarget(opts.archetype, opts.preferredBpmRange);
-  // STUB: actual implementation
-  throw new Error(
-    `BGM fetch not yet implemented. Target: archetype=${opts.archetype}, ` +
-      `bpm=${target}, duration=${opts.durationSeconds}s.\n` +
-      `To implement:\n` +
-      `  1. Search local royalty-free pool by archetype + BPM range\n` +
-      `  2. If miss, yt-dlp from curated channels (e.g. NoCopyrightSounds, FreePD)\n` +
-      `  3. ffmpeg trim/loop to ${opts.durationSeconds}s\n` +
-      `  4. aubiotrack --bpm and aubiotrack --offset for sync\n` +
-      `Output: mp3 at ${opts.outputPath}`
-  );
+export function shouldFetchBgm(archetype: BgmArchetype): boolean {
+  return archetype !== "silence-with-sfx" && archetype !== "speech-only";
 }
 
 // ----------------------------------------------------------------
-//  Helpers used by orchestrator
+//  Main fetcher
 // ----------------------------------------------------------------
 
-export function shouldFetchBgm(archetype: BgmArchetype): boolean {
-  return archetype !== "silence-with-sfx" && archetype !== "speech-only";
+export async function fetchBgm(opts: BgmFetchOptions): Promise<BgmAsset> {
+  if (!shouldFetchBgm(opts.archetype)) {
+    throw new Error(
+      `fetchBgm called with non-music archetype "${opts.archetype}".`
+    );
+  }
+
+  ensureToolsAvailable();
+
+  const targetBpm = getBpmTarget(opts.archetype, opts.preferredBpmRange);
+  const candidateCount = opts.candidateCount ?? 3;
+  const query = SEARCH_QUERIES[opts.archetype];
+  const tempDir = mkdtempSync(join(tmpdir(), "30x-bgm-"));
+
+  // 1. Download top candidates as mp3
+  const candidates = downloadCandidates(query, candidateCount, tempDir);
+
+  if (candidates.length === 0) {
+    throw new Error(
+      `BGM fetch found no candidates for archetype="${opts.archetype}". ` +
+        `yt-dlp search query: "${query}"`
+    );
+  }
+
+  // 2. Detect BPM for each, pick closest to target
+  let best: { path: string; bpm: number; firstBeatSec: number } | undefined;
+  let bestDelta = Infinity;
+  for (const candidatePath of candidates) {
+    try {
+      const detected = detectBpm(candidatePath);
+      const delta = Math.abs(detected.bpm - targetBpm);
+      if (delta < bestDelta) {
+        bestDelta = delta;
+        best = { path: candidatePath, ...detected };
+      }
+    } catch (err) {
+      // skip candidate that fails BPM detection
+      continue;
+    }
+  }
+
+  if (!best) {
+    throw new Error(
+      `BGM fetch: aubiotrack failed on all ${candidates.length} candidates.`
+    );
+  }
+
+  // 3. Trim or loop to target duration
+  const finalPath = opts.outputPath;
+  const dirName = dirname(finalPath);
+  if (!existsSync(dirName)) {
+    execFileSync("mkdir", ["-p", dirName]);
+  }
+  trimOrLoopToDuration({
+    sourcePath: best.path,
+    outputPath: finalPath,
+    targetDuration: opts.durationSeconds,
+    firstBeatSec: best.firstBeatSec,
+  });
+
+  return {
+    path: finalPath,
+    durationSeconds: opts.durationSeconds,
+    bpm: best.bpm,
+    firstBeatSec: best.firstBeatSec,
+    source: query,
+    archetype: opts.archetype,
+  };
+}
+
+// ----------------------------------------------------------------
+//  Helper: yt-dlp download
+// ----------------------------------------------------------------
+
+function downloadCandidates(
+  query: string,
+  count: number,
+  tempDir: string
+): string[] {
+  const args = [
+    `ytsearch${count}:${query}`,
+    "--no-playlist",
+    "--extract-audio",
+    "--audio-format",
+    "mp3",
+    "--audio-quality",
+    "0", // best
+    "--output",
+    join(tempDir, "%(autonumber)s.%(ext)s"),
+    "--quiet",
+    "--no-warnings",
+    "--no-progress",
+  ];
+
+  spawnSync("yt-dlp", args, { stdio: ["ignore", "pipe", "pipe"] });
+
+  // collect mp3 files in tempDir
+  if (!existsSync(tempDir)) return [];
+  return readdirSync(tempDir)
+    .filter((f) => f.endsWith(".mp3"))
+    .map((f) => join(tempDir, f))
+    .filter((p) => statSync(p).size > 100_000); // skip tiny / broken files
+}
+
+// ----------------------------------------------------------------
+//  Helper: aubiotrack BPM + first-beat detection
+// ----------------------------------------------------------------
+
+interface BpmDetection {
+  bpm: number;
+  firstBeatSec: number;
+}
+
+function detectBpm(audioPath: string): BpmDetection {
+  // aubiotrack outputs beat onset times (seconds), one per line
+  const result = spawnSync("aubiotrack", [audioPath], {
+    encoding: "utf-8",
+  });
+  if (result.status !== 0 || !result.stdout) {
+    throw new Error(
+      `aubiotrack failed for ${audioPath}: ${result.stderr ?? "no stdout"}`
+    );
+  }
+  const lines = result.stdout
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const beats = lines.map((l) => parseFloat(l)).filter((n) => !isNaN(n));
+  if (beats.length < 4) {
+    throw new Error(`aubiotrack returned < 4 beats for ${audioPath}`);
+  }
+
+  const firstBeatSec = beats[0];
+  // BPM = average beats-per-second × 60
+  const intervals: number[] = [];
+  for (let i = 1; i < beats.length; i++) {
+    intervals.push(beats[i] - beats[i - 1]);
+  }
+  // remove outliers (top/bottom 10%)
+  intervals.sort((a, b) => a - b);
+  const trimStart = Math.floor(intervals.length * 0.1);
+  const trimEnd = Math.ceil(intervals.length * 0.9);
+  const trimmed = intervals.slice(trimStart, trimEnd);
+  const avgInterval = trimmed.reduce((a, b) => a + b, 0) / trimmed.length;
+  const bpm = 60 / avgInterval;
+
+  return { bpm: parseFloat(bpm.toFixed(1)), firstBeatSec };
+}
+
+// ----------------------------------------------------------------
+//  Helper: ffmpeg trim or loop to target duration
+// ----------------------------------------------------------------
+
+interface TrimLoopOpts {
+  sourcePath: string;
+  outputPath: string;
+  targetDuration: number;
+  firstBeatSec: number;
+}
+
+function trimOrLoopToDuration(opts: TrimLoopOpts): void {
+  const sourceDuration = getAudioDuration(opts.sourcePath);
+
+  if (sourceDuration >= opts.targetDuration + 1) {
+    // trim: start at first beat to align with our timeline
+    const startSec = opts.firstBeatSec;
+    const args = [
+      "-y",
+      "-ss",
+      String(startSec),
+      "-i",
+      opts.sourcePath,
+      "-t",
+      String(opts.targetDuration),
+      "-acodec",
+      "libmp3lame",
+      "-b:a",
+      "192k",
+      "-af",
+      "afade=t=out:st=" +
+        String(opts.targetDuration - 1.5) +
+        ":d=1.5", // fade out last 1.5s
+      opts.outputPath,
+    ];
+    runFfmpeg(args);
+    return;
+  }
+
+  // loop: tile source until > target, then trim
+  const loopCount = Math.ceil(opts.targetDuration / sourceDuration) + 1;
+  const args = [
+    "-y",
+    "-stream_loop",
+    String(loopCount),
+    "-i",
+    opts.sourcePath,
+    "-t",
+    String(opts.targetDuration),
+    "-acodec",
+    "libmp3lame",
+    "-b:a",
+    "192k",
+    "-af",
+    "afade=t=out:st=" +
+      String(opts.targetDuration - 1.5) +
+      ":d=1.5",
+    opts.outputPath,
+  ];
+  runFfmpeg(args);
+}
+
+function runFfmpeg(args: string[]): void {
+  const result = spawnSync("ffmpeg", args, { stdio: ["ignore", "pipe", "pipe"] });
+  if (result.status !== 0) {
+    throw new Error(`ffmpeg failed: ${result.stderr?.toString() ?? "unknown error"}`);
+  }
+}
+
+function getAudioDuration(path: string): number {
+  const result = spawnSync(
+    "ffprobe",
+    [
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      path,
+    ],
+    { encoding: "utf-8" }
+  );
+  return parseFloat(result.stdout?.trim() ?? "0");
+}
+
+// ----------------------------------------------------------------
+//  Helper: ensure required tools are present
+// ----------------------------------------------------------------
+
+function ensureToolsAvailable(): void {
+  const required = ["yt-dlp", "aubiotrack", "ffmpeg", "ffprobe"];
+  for (const tool of required) {
+    const result = spawnSync("command", ["-v", tool], { shell: true });
+    if (result.status !== 0) {
+      throw new Error(
+        `Required tool not found: ${tool}.\n` +
+          `Install via: brew install yt-dlp aubio ffmpeg`
+      );
+    }
+  }
+}
+
+// ----------------------------------------------------------------
+//  CLI entry — quick test
+// ----------------------------------------------------------------
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const archetype = (process.argv[2] ?? "lo-fi-warm") as BgmArchetype;
+  const duration = parseFloat(process.argv[3] ?? "15");
+  const outputPath = process.argv[4] ?? "/tmp/test-bgm.mp3";
+  fetchBgm({ archetype, durationSeconds: duration, outputPath })
+    .then((asset) => {
+      console.log(JSON.stringify(asset, null, 2));
+    })
+    .catch((err) => {
+      console.error("BGM fetch failed:", err.message);
+      process.exit(1);
+    });
 }
