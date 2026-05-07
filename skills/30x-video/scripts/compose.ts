@@ -270,11 +270,15 @@ function buildSceneClip(
   dur: number,
   profile: DesignProfile
 ): string {
-  const onScreen = scene.onScreenText ? escapeHtml(scene.onScreenText) : "";
-  const voLine = scene.voLine ? escapeHtml(scene.voLine) : "";
-
-  const headingHtml = onScreen ? `<div class="heading">${onScreen}</div>` : "";
-  const voHtml = voLine ? `<div class="vo-line">${voLine}</div>` : "";
+  // PRIMARY PATH: scene.htmlBody (LLM-authored arbitrary HTML/CSS/SVG)
+  // FALLBACK: simple .heading div from onScreenText
+  let body: string;
+  if (scene.htmlBody) {
+    body = scene.htmlBody;
+  } else {
+    const onScreen = scene.onScreenText ? escapeHtml(scene.onScreenText) : "";
+    body = onScreen ? `<div class="heading">${onScreen}</div>` : "";
+  }
 
   return `      <div
         class="clip scene"
@@ -283,8 +287,7 @@ function buildSceneClip(
         data-duration="${dur.toFixed(2)}"
         data-track-index="${10 + scene.index}"
       >
-        ${headingHtml}
-        ${voHtml}
+        ${body}
       </div>`;
 }
 

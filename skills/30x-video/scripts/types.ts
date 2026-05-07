@@ -191,6 +191,13 @@ export interface SceneSpec {
   index: number;
   durationSeconds: number;
   visual: string;
+  /**
+   * Raw HTML body for the scene's visual content. When present, compose.ts
+   * uses this directly inside the clip wrapper. This is what "content-driven"
+   * means — LLM writes arbitrary HTML/CSS/SVG per scene, not just text.
+   * If undefined, compose.ts falls back to a simple .heading div with onScreenText.
+   */
+  htmlBody?: string;
   onScreenText?: string;
   voLine?: string;
   bgmBeat?: string;
