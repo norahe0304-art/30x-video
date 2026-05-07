@@ -43,30 +43,10 @@
 
         <!-- Logo Container -->
         <div class="logo-container">
-          <svg viewBox="0 0 160 240" width="160" height="240" class="logo-svg">
-            <!-- Replace these paths with your own logo SVG -->
-            <path
-              class="logo-piece logo-tl"
-              d="M 0 40 C 0 17.9 17.9 0 40 0 L 80 0 L 80 80 L 40 80 C 17.9 80 0 62.1 0 40 Z"
-              fill="#F24E1E"
-            />
-            <path
-              class="logo-piece logo-tr"
-              d="M 80 0 L 120 0 C 142.1 0 160 17.9 160 40 C 160 62.1 142.1 80 120 80 L 80 80 L 80 0 Z"
-              fill="#A259FF"
-            />
-            <path
-              class="logo-piece logo-ml"
-              d="M 0 120 C 0 97.9 17.9 80 40 80 L 80 80 L 80 160 L 40 160 C 17.9 160 0 142.1 0 120 Z"
-              fill="#FF7262"
-            />
-            <circle class="logo-piece logo-mr" cx="120" cy="120" r="40" fill="#1ABCFE" />
-            <path
-              class="logo-piece logo-bl"
-              d="M 0 200 C 0 177.9 17.9 160 40 160 L 80 160 L 80 200 C 80 222.1 62.1 240 40 240 C 17.9 240 0 222.1 0 200 Z"
-              fill="#0ACF83"
-            />
-          </svg>
+          <!-- 30x-video wordmark — 5 char-pieces using existing 5-piece animation classes -->
+          <div class="wordmark">
+            <span class="logo-piece logo-tl">3</span><span class="logo-piece logo-tr">0</span><span class="logo-piece logo-ml">x</span><span class="logo-piece logo-mr">/</span><span class="logo-piece logo-bl">v</span>
+          </div>
         </div>
 
         <div class="text-container">
@@ -81,7 +61,7 @@
         [data-composition-id="logo-outro"] .canvas {
           width: 1920px;
           height: 1080px;
-          background: #0a0a0f;
+          background: #131413;
           position: relative;
           overflow: hidden;
           font-family: "Inter", sans-serif;
@@ -89,11 +69,32 @@
 
         [data-composition-id="logo-outro"] .logo-container {
           position: absolute;
-          left: 880px;
+          left: 50%;
           top: 380px;
-          width: 160px;
-          height: 240px;
+          transform: translateX(-50%);
+          width: auto;
+          height: 200px;
           z-index: 2;
+          display: flex;
+          align-items: center;
+        }
+        [data-composition-id="logo-outro"] .wordmark {
+          display: flex;
+          gap: 0;
+          font-family: "Inter", sans-serif;
+          font-weight: 600;
+          font-size: 180px;
+          letter-spacing: -0.04em;
+          line-height: 1;
+          color: #F3F8F8;
+        }
+        [data-composition-id="logo-outro"] .wordmark .logo-piece {
+          display: inline-block;
+        }
+        [data-composition-id="logo-outro"] .wordmark .logo-mr {
+          color: #5E6CD0;
+          font-weight: 400;
+          padding: 0 8px;
         }
 
         [data-composition-id="logo-outro"] .logo-piece {
@@ -107,7 +108,7 @@
           top: 300px;
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(162, 89, 255, 0.25) 0%, rgba(10, 10, 15, 0) 70%);
+          background: radial-gradient(circle, rgba(94, 108, 208, 0.28) 0%, rgba(19, 20, 19, 0) 70%);
           border-radius: 50%;
           opacity: 0;
           pointer-events: none;
@@ -125,19 +126,21 @@
         }
 
         [data-composition-id="logo-outro"] .tagline {
-          font-size: 44px;
+          font-size: 56px;
           font-weight: 500;
-          color: white;
+          color: #F3F8F8;
           opacity: 0;
-          margin-bottom: 32px;
+          margin-bottom: 28px;
           text-align: center;
+          letter-spacing: -0.02em;
+          font-family: "Inter", sans-serif;
         }
 
         [data-composition-id="logo-outro"] .url-pill {
-          background: #1a1a1f;
-          border: 1px solid #2c2c2c;
+          background: rgba(94, 108, 208, 0.12);
+          border: 1px solid rgba(94, 108, 208, 0.4);
           border-radius: 100px;
-          padding: 8px 24px;
+          padding: 10px 28px;
           opacity: 0;
           display: flex;
           align-items: center;
@@ -145,9 +148,11 @@
         }
 
         [data-composition-id="logo-outro"] .url-text {
-          font-size: 18px;
-          color: #666;
-          letter-spacing: 0.5px;
+          font-size: 22px;
+          color: #5E6CD0;
+          letter-spacing: 0.04em;
+          font-weight: 500;
+          font-family: "Inter", sans-serif;
         }
       </style>
 

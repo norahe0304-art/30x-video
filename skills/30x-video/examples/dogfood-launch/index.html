@@ -12,12 +12,25 @@
         width: 1920px;
         height: 1080px;
         overflow: hidden;
-        background: #0a0a0a;
-        font-family: 'Geist', 'Inter', sans-serif;
+        background: #131413;
+        font-family: 'Inter', sans-serif;
       }
       .layer {
         position: absolute;
         inset: 0;
+      }
+      /* Hide HyperFrames watermarks embedded in catalog blocks */
+      [data-composition-id="vfx-text-cursor"] .stage-logo-wrap,
+      [data-composition-id="vfx-text-cursor"] .stage-logo,
+      [data-composition-id="vfx-text-cursor"] .vfx-stage-logo {
+        display: none !important;
+      }
+      /* Force dark theme bgs across all blocks (defensive override) */
+      [data-composition-id="data-chart"],
+      [data-composition-id="flowchart"],
+      [data-composition-id="logo-outro"],
+      [data-composition-id="vfx-text-cursor"] {
+        background: #131413 !important;
       }
     </style>
   </head>
