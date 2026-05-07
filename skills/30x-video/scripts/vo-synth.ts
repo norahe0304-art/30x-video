@@ -33,12 +33,13 @@ export interface VoSynthOptions {
 //  Voice mapping: archetype → Kokoro voice name
 // ----------------------------------------------------------------
 
+// Kokoro-82M voice IDs (verified via `npx hyperframes tts --list`)
 const VOICE_MAP: Record<VoArchetype, string> = {
   none: "",
-  "conversational-host": "bella",        // warm female
-  "authoritative-narrator": "chris",     // deep male narrator
-  "character-voice": "sarah",            // distinctive personality
-  "multi-speaker": "bella",              // primary, second voice swapped per scene
+  "conversational-host": "af_heart",       // warm American female
+  "authoritative-narrator": "bm_george",   // deep British male narrator
+  "character-voice": "bf_isabella",        // distinctive British female
+  "multi-speaker": "af_heart",             // primary, second swapped per scene
 };
 
 export function pickVoice(archetype: VoArchetype): string {
@@ -92,11 +93,11 @@ interface TtsCallOptions {
 
 async function runHyperframesTts(opts: TtsCallOptions): Promise<void> {
   return new Promise((resolve, reject) => {
+    // Real CLI shape: `npx hyperframes tts <input> --voice <id> --output <path>`
+    // (NOT `hyperframes media tts` — that was a guess that turned out wrong.)
     const args = [
       "hyperframes",
-      "media",
       "tts",
-      "--text",
       opts.text,
       "--voice",
       opts.voice,
@@ -108,7 +109,7 @@ async function runHyperframesTts(opts: TtsCallOptions): Promise<void> {
     child.on("error", (err) => {
       reject(
         new Error(
-          `hyperframes-media TTS failed: ${err.message}\n` +
+          `hyperframes tts failed: ${err.message}\n` +
             `Install: npm install hyperframes && npx hyperframes init`
         )
       );
@@ -116,12 +117,7 @@ async function runHyperframesTts(opts: TtsCallOptions): Promise<void> {
     child.on("exit", (code) => {
       if (code === 0) resolve();
       else
-        reject(
-          new Error(
-            `hyperframes-media TTS exited with code ${code}.\n` +
-              `Verify hyperframes-media skill is installed.`
-          )
-        );
+        reject(new Error(`hyperframes tts exited with code ${code}`));
     });
   });
 }
