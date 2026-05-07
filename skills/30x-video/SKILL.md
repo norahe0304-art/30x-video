@@ -249,9 +249,18 @@ Run hyperframes engine (Puppeteer + FFmpeg) → MP4.
 
 ### [8] Finish Gate
 
-Run `scripts/critique-scenes.ts` + `scripts/visual-audit.ts` +
-`scripts/timing-audit.ts`. See `references/design-rules/finish-gate.md`
-for pass conditions.
+Run `scripts/finish-gate.ts` which wraps three checks:
+
+1. `hyperframes lint --json` — engine-level correctness
+2. `hyperframes inspect --json` — text/container overflow at 9 sample timestamps
+3. Reading-time audit — every text element must hold long enough per
+   `taste.md` table (headline 2s, subtitle 3s, etc.) + max 12 words/scene
+
+See `references/design-rules/finish-gate.md` for pass conditions.
+
+PORTed scripts (`critique-scenes.ts`, `visual-audit.ts`, `timing-audit.ts`)
+remain in `scripts/` as reference for future LLM critique prompts but
+are NOT called from orchestrator (they are Remotion-specific).
 
 ### [9] Iterate
 
