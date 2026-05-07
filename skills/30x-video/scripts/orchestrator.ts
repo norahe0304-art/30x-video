@@ -28,8 +28,8 @@
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 import { analyzeContentHeuristic } from "./content-analyzer.ts";
-import { styleHunt } from "./style-hunter.ts";
 import { composeStyle } from "./style-composer.ts";
+import type { DesignProfile } from "./types.ts";
 import { findDiverseReferenceVideos } from "./video-search.ts";
 import { renderPlan, lockPlan } from "./confirmation-gate.ts";
 import { generateScriptHeuristic } from "./script-generator.ts";
@@ -54,15 +54,20 @@ export interface PlanPhaseResult {
   defaults: string[];
 }
 
-export async function planPhase(brief: string, intentOverride?: Partial<ContentIntent>): Promise<PlanPhaseResult> {
+export async function planPhase(
+  brief: string,
+  designProfile: DesignProfile,
+  intentOverride?: Partial<ContentIntent>
+): Promise<PlanPhaseResult> {
   // [1] Content Analyzer
   const intent = { ...analyzeContentHeuristic(brief), ...intentOverride };
 
-  // [2] Style Hunter
-  const huntResult = await styleHunt(intent);
+  // [2] Style research is delegated to the /refero-design skill at agent
+  //     runtime. The agent calls refero MCP tools, builds a DesignProfile,
+  //     and passes it in. No code-side Refero wrapper anymore.
 
   // [3] 5-dim Style Composer
-  const composition = composeStyle(intent, huntResult.profile);
+  const composition = composeStyle(intent, designProfile);
 
   // Look up reference videos in local INDEX.json
   const references = findDiverseReferenceVideos(composition, 3);
@@ -70,7 +75,7 @@ export async function planPhase(brief: string, intentOverride?: Partial<ContentI
   // Render plan for user
   const planRender = renderPlan({
     intent,
-    designProfile: huntResult.profile,
+    designProfile,
     composition,
     references,
   });
@@ -78,7 +83,7 @@ export async function planPhase(brief: string, intentOverride?: Partial<ContentI
   const pendingPlan = lockPlan(
     {
       intent,
-      designProfile: huntResult.profile,
+      designProfile,
       composition,
       references,
     },
@@ -214,7 +219,20 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       console.error("brief required");
       process.exit(1);
     }
-    planPhase(brief)
+    // CLI mode: pass a stub creator-default profile.
+    // In agent runtime, /refero-design produces the real profile.
+    const stubProfile: DesignProfile = {
+      source: "creator-default",
+      fonts: { heading: "Inter", body: "Inter" },
+      density: "balanced",
+      motionMood: "measured",
+      archetype: "Editorial Minimalism",
+      visualReferences: [],
+      textColor: "#fafafa",
+      backgroundColor: "#0a0a0a",
+      notes: ["CLI stub — agent runtime should pass a real profile from refero-design"],
+    };
+    planPhase(brief, stubProfile)
       .then((result) => {
         console.log(result.display);
         console.log("\n--- pendingPlan (save to file for execute) ---");

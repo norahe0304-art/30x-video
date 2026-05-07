@@ -1,47 +1,61 @@
 ---
 name: 30x-video
 description: |
-  Generate agency-grade marketing videos with auto-composed background music
-  and voice over. Trigger when user asks to: (a) make a marketing / launch /
-  product / social video, (b) animate a brand asset into video, (c) turn a
-  content brief / idea / thread / blog snippet into a video. Works for any
-  input — explicit brand, vibe + content, content-only creator post.
+  Generate agency-grade marketing videos with auto-composed BGM and voice
+  over. A thin stitching layer over Refero (design research) + Hyperframes
+  (HTML→MP4 engine). Trigger when user asks to make a marketing / launch /
+  product / social video, or turn content / a brief / a brand into video.
 
-  Do NOT trigger for: still image generation (use 30x-image), audio-only
-  outputs, live streaming setup, or video editing of user-uploaded clips
-  without a creative brief.
+  Do NOT trigger for: still images (use 30x-image), audio-only outputs,
+  video editing of user-uploaded clips without a creative brief.
 
-  RUNTIME: Requires hyperframes engine (which ships hyperframes-media for
-  TTS via Kokoro). Refero MCP recommended (auto-detects if installed).
+  REQUIRED skills (this skill stitches them):
+    - /refero-design — visual research + craft (typography / color / motion / anti-slop)
+    - /hyperframes — HTML composition authoring
+    - /hyperframes-cli — init / render / lint commands
+    - /hyperframes-media — Kokoro TTS for voice over
+    - /gsap — timeline animation API
+
+  RUNTIME: hyperframes engine + yt-dlp + aubiotrack + ffmpeg in PATH.
+  Refero MCP recommended (auto-detects). Without Refero, falls back to
+  creator-default design profile.
 ---
 
 <!--
-[INPUT]: User brief, optional brand, optional content assets, Refero MCP availability
+[INPUT]: User brief, optional brand, optional content assets, Refero MCP, hyperframes
 [OUTPUT]: Final MP4 with VO + BGM + critique report + decision manifest
-[POS]: skill 主入口; orchestrator 入口前的协议层
-[PROTOCOL]: 变更时更新此头部，然后检查 references/design-rules/
+[POS]: skill 主入口; 缝合层 — 不重复实现 Refero / Hyperframes 已有的事
+[PROTOCOL]: 变更时更新此头部，然后检查 references/
 -->
 
 # 30x-video — Tell it what you want, get a video.
 
-You are the operator of `30x-video`, a Claude Code / Codex skill that
-produces agency-grade marketing videos with auto-composed BGM and voice
-over. Three-line philosophy:
+You are the operator of `30x-video`. **This skill is intentionally thin** —
+it is the stitching layer between two world-class skills:
 
 ```
-Refero       is our design library    — taste comes from real screens
-Hyperframes  is our engine            — HTML+GSAP, Apache 2.0, no build
-Our pipeline is our soul              — the moat lives here
+/refero-design      handles  visual research + design taste + craft
+/hyperframes        handles  HTML composition + render engine + GSAP
+
+30x-video           handles  the video-specific glue:
+                              - 5-dim style picks (visual / pacing / bgm / vo / format)
+                              - Confirmation Gate
+                              - Script generation (brief → scene HTML)
+                              - VO synthesis via /hyperframes-media
+                              - BGM fetch (yt-dlp + aubiotrack + ffmpeg)
+                              - Hyperframes project assembly
+                              - Finish Gate (lint + inspect + reading-time audit)
 ```
 
-**The promise:** every user is proud of their video.
+We don't sell a tool. We sell the ability for every user to be proud of
+their video.
 
 ---
 
 ## CRITICAL: Confirmation Gate (must read first)
 
 **ABSOLUTELY DO NOT** start any rendering / asset generation / Refero MCP
-call beyond search before you have:
+heavy call before you have:
 
 1. Listed ALL inferred decisions (format / duration / visual style / pacing
    / VO archetype / BGM archetype / on-screen text strategy)
@@ -53,123 +67,73 @@ call beyond search before you have:
 - Render-then-ask
 - Partial confirmation, silently decide the rest
 - "User probably means X" assumptions
-- "I'll do it first, ask later"
 
-**Required:**
-- Ask everything in one batch
-- Use a clear table or list
-- Wait for explicit `go`
-
-This is the single most important rule. Violations waste user time, money,
-and trust.
+See `references/confirmation-gate.md` for the full protocol.
 
 ---
 
 ## Quickstart — what to surface when invoked
 
-When user invokes `30x-video` (or types `/30x-video`), reply with this
-4-block menu BEFORE asking questions one at a time. Most users don't know
-what's available until they see it.
-
-**MANDATORY 4 blocks — do NOT abbreviate:**
-
-### Block 1: One-line interface
-
 ```
 Use 30x-video. Make a [duration] [format] video about [topic].
 ```
 
-### Block 2: 4 concrete examples (mirror these literally)
-
-```
 Examples:
 
-# Creator content (no brand)
+```
 Use 30x-video. Make a 15s vertical video about morning routines.
-
-# Branded campaign
 Use 30x-video. Make a 30s ad for Stripe's new fraud detection feature.
-
-# Vibe-driven (object + mood)
 Use 30x-video. Make a video for this coffee cup with a warm minimalist vibe.
-
-# Brand init (URL-driven)
 Use 30x-video. Make a 40s product launch video for acmecorp.io.
 ```
 
-### Block 3: What you can adjust mid-conversation
-
-```
-- Format: 16:9 horizontal / 9:16 vertical / 1:1 square / 4:5 social
-- Duration: 7-15s (hook), 15-30s (social), 30-40s (launch)
-- Voice over: warm narrator / authoritative / conversational / none
-- BGM mood: ambient / cinematic / lo-fi / techno / silent
-- Visual style: cinematic-luxury / product-ui / lifestyle / typography / data-viz
-```
-
-### Block 4: How the agent works
-
-```
-1. You describe what you want
-2. Agent lays out a complete plan + asks any ambiguous questions
-3. You confirm or adjust
-4. Agent renders silently (5-15 min)
-5. Agent runs Finish Gate critique, iterates ≤ 2 times if needed
-6. You get: video.mp4 + manifest.json + critique.md
-```
-
-**Response language:** mirror the user's language (English brief → English
-menu, Chinese brief → Chinese menu). Keep these as English literals
-regardless of language: format identifiers (`16:9` / `9:16` / `1:1` /
-`4:5`), file paths, frontmatter field names.
+You describe what you want. The agent lays out a complete plan + asks any
+ambiguous questions in one batch. You confirm or adjust. The agent renders
+silently. You get a video + manifest + critique report.
 
 ---
 
 ## The Pipeline (9 steps)
 
-### [1] Content Analyzer
+### [1] Content Analyzer (this skill)
 
-Read the user's brief. Extract:
+Read the user's brief. Extract: subject / mood / audience / length-hint
+/ format-hint / tone / brand. See `scripts/content-analyzer.ts`.
 
-- **subject:** what is the video about?
-- **mood tags:** warm / minimalist / luxury / playful / serious / etc.
-- **audience:** who watches this?
-- **length-hint:** explicit number, or inferred from format
-- **format-hint:** explicit, or inferred from platform mention
-- **tone:** educational / hot-take / inspirational / witty / vulnerable
+### [2] Style Research — INVOKE /refero-design
 
-If brief is too vague to extract these, **ask the user one focused
-clarification question** before proceeding.
+**Do NOT search Refero MCP directly from this skill**. Invoke the
+`/refero-design` skill, which encapsulates:
 
-### [2] Style Hunter
+- Discovery questions
+- Refero MCP search strategies (broad → narrow → leader)
+- Pattern extraction from real products
+- Craft references: typography, color, motion, icons, anti-AI-slop, copywriting
+- The 5-tool MCP API: `refero_search_screens` / `refero_search_flows` /
+  `refero_get_screen` / `refero_get_flow` / `refero_get_design_guidance`
 
-Three modes, transparent to user — try in order, use first that succeeds.
+Output of /refero-design feeds back as a `DesignProfile`:
 
-**Mode A — explicit brand:**
-- Call `refero_search_screens` with brand name as query
-- Get top screens, extract design tokens (fonts, ui_elements, ux_patterns)
-- Synthesize lightweight design profile from screen metadata + visual analysis
+```typescript
+{
+  source: "refero-research" | "creator-default",
+  brand?: string,
+  fonts: { heading, body, mono? },     // from real Refero brand fonts
+  density: "compact" | "balanced" | "airy",
+  motionMood: "precise" | "measured" | "expressive",
+  archetype: "Financial Precision" | "System Clarity" | ...,
+  visualReferences: ReferoScreen[],     // metadata only, NOT screenshots
+  notes: string[],
+}
+```
 
-**Mode B — vibe / aesthetic search:**
-- Build query from `subject + moodTags`
-- `refero_search_screens(query, limit=20)`
-- Aggregate by `site_name` to find top brand candidates
-- For top match, pull 5-10 screens and synthesize design profile
-- Surface candidate brand name to user in Confirmation Gate
+**Do not embed Refero screenshots in the final video.** The metadata
+(fonts / ux_patterns / ui_elements / descriptions) informs LLM scene
+HTML generation; the visuals are written from scratch in HTML+CSS+SVG.
 
-**Mode C — pure content (creator):**
-- Default to archetype based on tone (see `references/design-rules/archetypes.md`)
-- Use Refero search for editorial / portfolio / blog-grade screens
-- Synthesize neutral design profile
+### [3] 5-dim Style Composer (this skill)
 
-In all modes:
-- Pull 50 screens from `refero_get_screen` with `image_size: "thumbnail"`
-  for visual reference during composition
-- These are NOT shown to user — they inform agent's compositional choices
-
-### [3] 5-dim Style Composer
-
-Pick ONE option from each dimension based on content + design profile:
+Pick ONE option from each dimension based on content + DesignProfile:
 
 | Dim | Options |
 |---|---|
@@ -179,127 +143,79 @@ Pick ONE option from each dimension based on content + design profile:
 | **VO** | none / conversational-host / authoritative-narrator / character-voice / multi-speaker |
 | **Format** | 16:9 / 9:16 / 1:1 / 4:5 |
 
-Reference the `references/video-library/INDEX.json` to find 2-3 real videos
-that exemplify the chosen combination. Use them as compositional reference.
+See `references/style-dimensions.md` for decision heuristics + anti-pattern
+combos.
 
-### 🚪 Confirmation Gate
+Reference `references/video-library/INDEX.json` to find 2-3 real videos
+that exemplify the chosen combination.
 
-After [1]-[3], present this to the user (NEVER skip):
+### 🚪 Confirmation Gate (this skill)
 
-```
-┌─── Video Plan ───────────────────────────────────────┐
-│ Topic:        morning routines                        │
-│ Duration:     15s                                     │
-│ Format:       9:16 vertical                           │
-│ Visual:       lifestyle-shot                          │
-│ Pacing:       quick-hook                              │
-│ Voice over:   conversational-host (warm female)       │
-│ BGM:          lo-fi-warm                              │
-│ Reference:    Apple "Why Mac" (0:30-1:10)             │
-│               Aesop "Eau de Parfum" (full)            │
-└───────────────────────────────────────────────────────┘
+Present the locked plan. Wait for `go`. See above.
 
-Questions:
-1. Voice over text: should I draft it, or do you have a script?
-2. Any specific brand or visual reference you want me to match?
+### [4] Script Generator — content-driven HTML (this skill)
 
-Reply 'go' to proceed with these defaults, or adjust any line.
-```
+For each scene, the agent writes **hyperframes-compliant HTML** using:
 
-Wait for user response. Do NOT continue until decisions are locked.
+- Real fonts from DesignProfile (from Refero brand metadata)
+- UX patterns / UI elements from Refero descriptions (as design vocabulary)
+- 5-dim composition picks
+- /refero-design `get_design_guidance` recommendations
 
-### [4] Script Generator
+NEVER reference Refero screenshots via `<img src>`. All visuals are
+authored as div + CSS + SVG + animated typography. INVOKE `/gsap` for
+timeline animation help if needed.
 
-Once approved, generate scene-by-scene shotlist:
+Output per scene: `htmlBody` string that goes inside the `class="clip"`
+wrapper. Hard rules from `/hyperframes`:
 
-```yaml
-- scene: 1
-  duration: 2.5s
-  visual: opening hero shot, slow zoom, warm light
-  on_screen_text: "Mornings make us"
-  vo_line: "Most days, I get up at 6:30."
-  bgm_beat: bar 1 downbeat
-- scene: 2
-  ...
-```
+- Every clip needs `data-start` / `data-duration` / `data-track-index`
+- Timeline must be paused; registered on `window.__timelines["main"]`
+- After GSAP exit tween, add `tl.set` hard-kill at clip end
 
-### [5] Asset Producer (parallel)
+### [5] Asset Producer — parallel (this skill)
 
-- **VO:** call hyperframes-media TTS (Kokoro). One provider, no switching.
-- **BGM:** fetch royalty-free track matching mood + tempo, run aubiotrack BPM detection
-- **Visuals:**
-  - Hyperframes HTML/CSS animations (UI mockups, typography, transitions)
-  - User-provided assets (jobspec.content_assets[])
-  - Refero reference screens (used as compositional inspiration, not direct embed unless licensed)
-  - Brand site scrape if applicable
-  - **Do NOT call 30x-image by default.** Only if user explicitly requests
-    a generated still and provides `generate_stills: true` in jobspec.
+- **VO**: `scripts/vo-synth.ts` calls `/hyperframes-media` Kokoro TTS
+- **BGM**: `scripts/bgm-fetch.ts` runs yt-dlp from curated NCS/Lofi Girl
+  queries, aubiotrack BPM, ffmpeg trim/loop to target duration
 
-### [6] Composer
+### [6] Composer (this skill)
 
-Generate hyperframes HTML + GSAP timeline:
-- VO timeline: each VO line locked to a scene start frame
-- BGM beat alignment: scene transitions land on bar / beat
-- Typography: applied from synthesized design profile
-- Anti-slop checks during composition (reject patterns from `taste.md` blacklist)
+`scripts/compose.ts` builds a Hyperframes project directory:
+- `index.html` (LLM-written scene HTML wrapped in clips + GSAP timeline)
+- `hyperframes.json`, `meta.json`, `assets/`
 
-### [7] Render
+### [7] Render — INVOKE /hyperframes-cli
 
-Run hyperframes engine (Puppeteer + FFmpeg) → MP4.
+`scripts/render.ts` calls `npx hyperframes render <project-dir>`.
 
-### [8] Finish Gate
+### [8] Finish Gate (this skill)
 
-Run `scripts/finish-gate.ts` which wraps three checks:
+`scripts/finish-gate.ts` runs three checks:
+1. `npx hyperframes lint --json` — engine-level correctness
+2. `npx hyperframes inspect --json` — text/container overflow
+3. Reading-time audit per `/refero-design` taste rules — every text element
+   must hold long enough (taste.md table); max 12 words per scene
 
-1. `hyperframes lint --json` — engine-level correctness
-2. `hyperframes inspect --json` — text/container overflow at 9 sample timestamps
-3. Reading-time audit — every text element must hold long enough per
-   `taste.md` table (headline 2s, subtitle 3s, etc.) + max 12 words/scene
+### [9] Iterate (this skill)
 
-See `references/design-rules/finish-gate.md` for pass conditions.
-
-PORTed scripts (`critique-scenes.ts`, `visual-audit.ts`, `timing-audit.ts`)
-remain in `scripts/` as reference for future LLM critique prompts but
-are NOT called from orchestrator (they are Remotion-specific).
-
-### [9] Iterate
-
-If Finish Gate fails: adjust 5-dim Style Composer choices, re-render. Max
-2 iterations. After 2 fails, surface to user with explicit reasoning — do
-not silently ship a third attempt.
+If Finish Gate fails: adjust 5-dim picks, re-render. Max 2 iterations.
+After 2 fails, surface to user with explicit reasoning.
 
 ---
 
 ## Output Contract
 
-Every successful run produces:
-
 ```
 output/{job-id}/
 ├── video.mp4              final cut (with VO + BGM)
-├── video.no-vo.mp4        same cut without VO (for client adjustment)
-├── video.bgm-only.mp4     same cut with only BGM (for VO re-takes)
-├── manifest.json          all decisions: 5-dim choices, brand, candidates considered, etc.
+├── manifest.json          all decisions: 5-dim choices, design profile, refs
 ├── critique.md            Finish Gate report
-├── assets/
-│   ├── vo.wav
-│   ├── bgm.mp3
-│   └── stills/            keyframes if generated
-└── refs/
-    └── refero-screens.json  which Refero screens influenced composition
+├── hyperframes-project/   the built project (re-runnable)
+└── assets/
+    ├── vo.wav
+    └── bgm.mp3
 ```
-
----
-
-## Tech Stack Reference
-
-| Layer | Choice | Notes |
-|-------|--------|-------|
-| Engine | hyperframes | Apache 2.0, single-machine, HTML+GSAP |
-| Design library | Refero MCP | 4 tools: `refero_search_screens`, `refero_get_screen`, `refero_search_flows`, `refero_get_flow` |
-| TTS | Kokoro via hyperframes-media | Single provider — upgrade hyperframes-media if higher quality needed |
-| BGM | royalty-free + yt-dlp | aubiotrack for BPM detection |
-| Critique | LLM (Claude / GPT) | Auto-iterate ≤ 2 times |
 
 ---
 
@@ -309,43 +225,59 @@ output/{job-id}/
 skills/30x-video/
 ├── SKILL.md                       this file
 ├── references/
-│   ├── design-rules/
-│   │   ├── taste.md               anti-slop blacklist + taste pillars
-│   │   ├── finish-gate.md         pre-delivery blocking gate
-│   │   └── archetypes.md          5 design archetypes
-│   ├── video-library/             50 real video references (the curation)
-│   │   ├── INDEX.json
-│   │   └── by-{visual-style,pacing,bgm-mood,vo-style,format,use-case}/
-│   ├── anti-slop.md               video-specific blacklist
 │   ├── confirmation-gate.md       full Confirmation Gate protocol
-│   └── style-dimensions.md        5-dim options + decision heuristics
-├── scripts/                       TypeScript pipeline (orchestrator + 12 modules)
-├── examples/                      sample outputs
-├── scaffold/                      hyperframes project template
-└── benchmarks/                    E2E regression tests
+│   ├── style-dimensions.md        5-dim options + decision heuristics
+│   ├── anti-slop.md               video-format-specific anti-slop
+│   │                              (transitions / BGM / VO / on-screen text)
+│   └── video-library/
+│       ├── INDEX.json             50 hand-curated reference videos
+│       └── README.md
+├── scripts/
+│   ├── orchestrator.ts            main entry (planPhase + executePhase)
+│   ├── content-analyzer.ts        [1]
+│   ├── style-composer.ts          [3]
+│   ├── confirmation-gate.ts       🚪
+│   ├── script-generator.ts        [4] LLM HTML generation prompt + heuristic
+│   ├── vo-synth.ts                [5] hyperframes-media wrapper
+│   ├── bgm-fetch.ts               [5] yt-dlp + aubiotrack + ffmpeg
+│   ├── beat-sync.ts               [5] BPM helper (PORTed)
+│   ├── compose.ts                 [6] Hyperframes project builder
+│   ├── render.ts                  [7] hyperframes render wrapper
+│   ├── finish-gate.ts             [8] lint + inspect + timing audit
+│   ├── video-search.ts            INDEX.json reference search
+│   ├── types.ts                   shared TypeScript types
+│   └── (reference: critique-scenes.ts / visual-audit.ts / timing-audit.ts —
+│        Remotion-specific, kept for future LLM critique prompts)
+├── examples/
+└── benchmarks/
 ```
+
+**Notice what's NOT here:**
+- No `design-rules/taste.md` — `/refero-design` provides this
+- No `design-rules/finish-gate.md` — `/refero-design` craft + our timing audit
+- No `design-rules/archetypes.md` — `/refero-design` archetype work
+- No `refero-search.ts` / `style-hunter.ts` / `design-synthesizer.ts` —
+  agent invokes `/refero-design` directly at runtime
+
+This is by design. **Don't reinvent what's already done.**
 
 ---
 
-## Failure Modes (when to surface to user, not retry silently)
+## Failure Modes (surface to user, not silent retry)
 
-- Refero MCP unavailable AND no brand specified AND no creator preset matches
-- hyperframes-media TTS unreachable (skill not installed or Kokoro init failed)
-- BGM fetch fails after 3 retries
-- Finish Gate fails 2 consecutive iterations
-- User-provided asset format unsupported
-- hyperframes render returns non-zero exit
+- /refero-design unavailable AND no brand specified → fall back to creator-default profile + warn user
+- hyperframes-media TTS unreachable → drop VO from this run, surface to user
+- BGM fetch fails after 3 retries → use silence-with-sfx archetype, warn user
+- Finish Gate fails 2 consecutive iterations → surface all violations
+- Hyperframes render returns non-zero → surface stderr to user
 
-In all cases: surface failure with specific reasoning + suggest actionable next step. Do not silently degrade quality.
+In all cases: surface failure with specific reasoning + actionable next step.
 
 ---
 
 ## When NOT to use 30x-video
 
 - User wants a still image → `30x-image`
-- User wants Remotion-specific React work → that ecosystem (deprecated in this lineage)
-- User wants to edit existing video clips (no brief, just clip surgery) → use a non-AI editor
+- User wants only audio → use a TTS skill directly
 - User wants live-action footage (real camera) → out of scope
-- User wants only audio (podcast / voice clip) → use a TTS skill directly
-
-If the user is in one of these zones, surface the right alternative tool. Don't try to make 30x-video do something it isn't designed for.
+- User wants to edit existing video clips (no brief) → use a non-AI editor
