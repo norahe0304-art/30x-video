@@ -11,109 +11,201 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
       :root {
-        /* Refero MCP query "Linear minimalist dark mode product" → real tokens */
-        --bg: #131413;
-        --surface: #1d1f24;
-        --border: #2a2c30;
+        --bg: #0e0f10;
+        --surface: #1a1c20;
+        --surface-2: #22252b;
+        --border: #2c2f36;
         --text: #f3f8f8;
         --text-dim: #909398;
         --accent: #5e6cd0;
+        --accent-2: #818bdc;
         --accent-soft: rgba(94, 108, 208, 0.18);
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body {
-        width: 1920px;
-        height: 1080px;
-        overflow: hidden;
-        background: var(--bg);
-        color: var(--text);
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: var(--bg); color: var(--text);
         font-family: 'Inter', sans-serif;
         font-feature-settings: 'cv11', 'ss01';
       }
+
+      /* === Animated mesh gradient bg (subtle, never the focus) === */
+      .mesh-bg {
+        position: absolute; inset: 0; z-index: 0; pointer-events: none;
+        background:
+          radial-gradient(ellipse 60% 50% at 20% 30%, rgba(94, 108, 208, 0.18), transparent 60%),
+          radial-gradient(ellipse 50% 40% at 80% 70%, rgba(129, 139, 220, 0.10), transparent 60%),
+          radial-gradient(ellipse 40% 30% at 50% 50%, rgba(94, 108, 208, 0.05), transparent 70%),
+          var(--bg);
+      }
+
       .scene {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
         opacity: 0;
-        padding: 120px 160px;
+        padding: 100px 140px;
+        z-index: 5;
+        transform-origin: center center;
+      }
+
+      /* === Shimmer-sweep target plumbing === */
+      .shimmer-sweep-target {
+        position: relative; display: inline-block;
+      }
+      .shimmer-sweep-target .shimmer-mask {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        background: linear-gradient(
+          var(--shimmer-angle, 110deg),
+          transparent 0%,
+          transparent calc(var(--shimmer-pos, -20%) - var(--shimmer-width, 20%) / 2),
+          var(--shimmer-color, rgba(255,255,255,0.7)) var(--shimmer-pos, -20%),
+          transparent calc(var(--shimmer-pos, -20%) + var(--shimmer-width, 20%) / 2),
+          transparent 100%
+        );
+        mix-blend-mode: overlay;
       }
 
       /* ──────── Scene 1: Hook ──────── */
-      #s1 .stack { display: flex; flex-direction: column; gap: 40px; max-width: 1400px; }
-      #s1 .label { font-family: 'JetBrains Mono', monospace; font-size: 28px;
-        color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; }
-      #s1 .prompt { font-size: 96px; font-weight: 500; line-height: 1.15;
-        letter-spacing: -0.025em; color: var(--text); }
+      #s1 .stack { display: flex; flex-direction: column; gap: 36px; max-width: 1500px; }
+      #s1 .label {
+        font-family: 'JetBrains Mono', monospace; font-size: 24px;
+        color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase;
+        opacity: 0; transform: translateY(20px);
+      }
+      #s1 .prompt {
+        font-size: 120px; font-weight: 500; line-height: 1.05;
+        letter-spacing: -0.035em; color: var(--text);
+        opacity: 0; transform: translateY(30px);
+      }
       #s1 .prompt .hl { color: var(--accent); }
-      #s1 .cursor { display: inline-block; width: 6px; height: 88px;
-        background: var(--accent); vertical-align: middle; margin-left: 8px;
-        transform: translateY(8px); }
+      #s1 .cursor {
+        display: inline-block; width: 8px; height: 110px;
+        background: var(--accent); vertical-align: middle; margin-left: 10px;
+        transform: translateY(8px);
+        box-shadow: 0 0 24px var(--accent);
+      }
 
       /* ──────── Scene 2: Refero metadata ──────── */
-      #s2 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
-        max-width: 1400px; width: 100%; }
-      #s2 .card { background: var(--surface); border: 1px solid var(--border);
-        border-radius: 16px; padding: 40px 44px; opacity: 0; transform: translateY(24px); }
-      #s2 .card-label { font-family: 'JetBrains Mono', monospace; font-size: 22px;
-        color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
-        margin-bottom: 20px; }
-      #s2 .card-value { font-size: 56px; font-weight: 500; letter-spacing: -0.02em;
-        line-height: 1.1; }
-      #s2 .card-sub { font-family: 'JetBrains Mono', monospace; font-size: 20px;
-        color: var(--text-dim); margin-top: 12px; }
+      #s2 .grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+        max-width: 1400px; width: 100%;
+        perspective: 2000px;
+      }
+      #s2 .card {
+        background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+        border: 1px solid var(--border);
+        border-radius: 20px; padding: 44px 48px;
+        opacity: 0; transform: translateY(40px) rotateX(-12deg);
+        transform-origin: center bottom;
+        position: relative;
+        box-shadow: 0 20px 60px -20px rgba(0,0,0,0.5);
+      }
+      #s2 .card::before {
+        content: ''; position: absolute; inset: 0;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(94,108,208,0.10), transparent 50%);
+        pointer-events: none;
+      }
+      #s2 .card-label {
+        font-family: 'JetBrains Mono', monospace; font-size: 22px;
+        color: var(--text-dim); letter-spacing: 0.14em; text-transform: uppercase;
+        margin-bottom: 22px;
+      }
+      #s2 .card-value {
+        font-size: 64px; font-weight: 500; letter-spacing: -0.025em;
+        line-height: 1;
+      }
+      #s2 .card-sub {
+        font-family: 'JetBrains Mono', monospace; font-size: 19px;
+        color: var(--text-dim); margin-top: 14px; letter-spacing: 0.04em;
+      }
       #s2 .card .accent { color: var(--accent); }
+      #s2 .card.glow { box-shadow: 0 0 80px -10px rgba(94,108,208,0.5); }
 
       /* ──────── Scene 3: Pipeline ──────── */
-      #s3 .pipeline { display: flex; align-items: center; justify-content: center;
-        gap: 24px; max-width: 1700px; width: 100%; }
-      #s3 .step { background: var(--surface); border: 1px solid var(--border);
-        border-radius: 14px; padding: 28px 32px; flex: 1; opacity: 0;
-        transform: translateY(24px); display: flex; flex-direction: column; gap: 8px; }
-      #s3 .step-name { font-family: 'JetBrains Mono', monospace; font-size: 22px;
-        color: var(--accent); letter-spacing: 0.06em; }
-      #s3 .step-desc { font-size: 28px; font-weight: 500; color: var(--text); line-height: 1.25; }
-      #s3 .arrow { color: var(--text-dim); font-size: 32px; opacity: 0; }
+      #s3 .pipeline {
+        display: flex; align-items: center; justify-content: center;
+        gap: 0; max-width: 1700px; width: 100%;
+        perspective: 2200px;
+      }
+      #s3 .step {
+        background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+        border: 1px solid var(--border);
+        border-radius: 16px; padding: 32px 36px; flex: 1;
+        opacity: 0; transform: translateY(30px) rotateY(-25deg);
+        transform-origin: left center;
+        display: flex; flex-direction: column; gap: 10px;
+        box-shadow: 0 16px 40px -16px rgba(0,0,0,0.6);
+      }
+      #s3 .step-name {
+        font-family: 'JetBrains Mono', monospace; font-size: 20px;
+        color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+      }
+      #s3 .step-desc {
+        font-size: 30px; font-weight: 500; color: var(--text);
+        line-height: 1.2; letter-spacing: -0.015em;
+      }
+      #s3 .arrow {
+        flex: 0 0 50px;
+        height: 2px; background: var(--text-dim);
+        position: relative; margin: 0 6px;
+        transform: scaleX(0); transform-origin: left center;
+      }
+      #s3 .arrow::after {
+        content: '';
+        position: absolute; right: -4px; top: -5px;
+        width: 0; height: 0;
+        border-left: 8px solid var(--text-dim);
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+      }
 
       /* ──────── Scene 4: Brand close ──────── */
-      #s4 .brand-stack { display: flex; flex-direction: column; align-items: center;
-        gap: 36px; text-align: center; }
-      #s4 .wordmark { font-family: 'Inter', sans-serif; font-size: 200px;
-        font-weight: 600; letter-spacing: -0.04em; line-height: 1; color: var(--text);
-        display: flex; }
-      #s4 .wordmark .ch { display: inline-block; opacity: 0; transform: translateY(40px); }
-      #s4 .wordmark .sep { color: var(--accent); font-weight: 400; padding: 0 8px; }
-      #s4 .tagline { font-size: 56px; font-weight: 400; letter-spacing: -0.015em;
-        color: var(--text-dim); opacity: 0; transform: translateY(20px); }
+      #s4 .brand-stack {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 40px; text-align: center;
+      }
+      #s4 .wordmark {
+        font-family: 'Inter', sans-serif; font-size: 220px;
+        font-weight: 600; letter-spacing: -0.045em; line-height: 1;
+        color: var(--text); display: flex;
+      }
+      #s4 .wordmark .ch { display: inline-block; opacity: 0; transform: translateY(50px); }
+      #s4 .wordmark .sep { color: var(--accent); font-weight: 400; padding: 0 12px; }
+      #s4 .tagline {
+        font-size: 60px; font-weight: 400; letter-spacing: -0.018em;
+        color: var(--text-dim); opacity: 0; transform: translateY(20px);
+      }
       #s4 .tagline .accent { color: var(--accent); font-weight: 500; }
-      #s4 .pill { display: inline-flex; padding: 12px 28px;
-        background: var(--accent-soft); border: 1px solid rgba(94,108,208,0.4);
+      #s4 .pill {
+        display: inline-flex; padding: 14px 32px;
+        background: var(--accent-soft); border: 1px solid rgba(94,108,208,0.45);
         border-radius: 100px; font-family: 'JetBrains Mono', monospace;
-        font-size: 22px; color: var(--accent); letter-spacing: 0.06em;
-        opacity: 0; transform: translateY(15px); }
+        font-size: 22px; color: var(--accent); letter-spacing: 0.08em;
+        opacity: 0; transform: translateY(15px) scale(0.85);
+      }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="22"
          data-width="1920" data-height="1080">
 
+      <!-- Continuous mesh gradient bg (animated) -->
+      <div class="mesh-bg" id="mesh-bg"></div>
+
       <!-- ───── Scene 1 (0-6s): Hook ───── -->
       <div class="clip scene" id="s1" data-start="0" data-duration="6"
            data-width="1920" data-height="1080" data-track-index="10">
         <div class="stack">
-          <div class="label">You</div>
+          <div class="label">YOU</div>
           <div class="prompt">
-            Make a 15s social about <span class="hl"></span><span class="cursor"></span>
+            <span class="shimmer-sweep-target">
+              Make a 15s social about <span class="hl"></span><span class="cursor"></span>
+            </span>
           </div>
         </div>
       </div>
-
-      <!-- Removed light-leak transition block — it has visible "LIGHT LEAK"
-           label + tutorial text overlay. Catalog transition blocks are demos
-           of themselves, not invisible transition primitives. Pure opacity
-           crossfade between scenes is cleaner. -->
-
 
       <!-- ───── Scene 2 (6-12s): Refero metadata ───── -->
       <div class="clip scene" id="s2" data-start="6" data-duration="6"
@@ -142,31 +234,25 @@
         </div>
       </div>
 
-      <!-- Removed cinematic-zoom transition block (same reason as light-leak above). -->
-
-
       <!-- ───── Scene 3 (12-18s): Pipeline ───── -->
       <div class="clip scene" id="s3" data-start="12" data-duration="6"
            data-width="1920" data-height="1080" data-track-index="12">
         <div class="pipeline">
           <div class="step st1"><div class="step-name">brief</div><div class="step-desc">your sentence</div></div>
-          <div class="arrow ar1">→</div>
+          <div class="arrow ar1"></div>
           <div class="step st2"><div class="step-name">refero</div><div class="step-desc">design tokens</div></div>
-          <div class="arrow ar2">→</div>
+          <div class="arrow ar2"></div>
           <div class="step st3"><div class="step-name">script</div><div class="step-desc">scene HTML</div></div>
-          <div class="arrow ar3">→</div>
+          <div class="arrow ar3"></div>
           <div class="step st4"><div class="step-name">render</div><div class="step-desc">MP4 file</div></div>
         </div>
       </div>
-
-      <!-- Removed light-leak transition block (same reason as above). -->
-
 
       <!-- ───── Scene 4 (18-22s): Brand ───── -->
       <div class="clip scene" id="s4" data-start="18" data-duration="4"
            data-width="1920" data-height="1080" data-track-index="13">
         <div class="brand-stack">
-          <div class="wordmark">
+          <div class="wordmark shimmer-sweep-target">
             <span class="ch">3</span><span class="ch">0</span><span class="ch">x</span><span class="ch sep">/</span><span class="ch">v</span><span class="ch">i</span><span class="ch">d</span><span class="ch">e</span><span class="ch">o</span>
           </div>
           <div class="tagline">Tell it what you want. <span class="accent">Get a video.</span></div>
@@ -174,13 +260,12 @@
         </div>
       </div>
 
-      <!-- Continuous grain overlay -->
+      <!-- Continuous grain overlay (only catalog component used) -->
       <div class="layer clip" data-composition-id="grain"
            data-composition-src="compositions/components/grain-overlay.html"
            data-start="0" data-duration="22"
            data-width="1920" data-height="1080" data-track-index="99"></div>
 
-      <!-- Audio -->
       <audio class="clip" id="vo-track" src="assets/vo.wav"
              data-start="0" data-duration="22" data-track-index="80" preload="auto"></audio>
       <audio class="clip" id="bgm-track" src="assets/bgm.mp3"
@@ -188,22 +273,47 @@
     </div>
 
     <script>
+      // Auto-inject .shimmer-mask
+      document.querySelectorAll(".shimmer-sweep-target").forEach((el) => {
+        if (!el.querySelector(".shimmer-mask")) {
+          const m = document.createElement("div");
+          m.className = "shimmer-mask";
+          el.appendChild(m);
+        }
+      });
+
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      // ── Scene 1 ──
+      // ── Continuous mesh-bg drift (whole 22s) ──
+      tl.to("#mesh-bg", {
+        backgroundPosition: "10% 10%, 70% 60%, 30% 70%",
+        duration: 22, ease: "none",
+      }, 0);
+
+      // ── Scene 1: Hook ──
       tl.to("#s1", { opacity: 1, duration: 0.5 }, 0);
+      tl.to("#s1 .label", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.2);
+      tl.to("#s1 .prompt", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.5);
+      // ken-burns subtle zoom on whole scene
+      tl.fromTo("#s1", { scale: 1.0 }, { scale: 1.04, duration: 6, ease: "none" }, 0);
+      // type out "morning routines"
       const hl = "morning routines";
       hl.split("").forEach((_, i) => {
-        tl.set("#s1 .hl", { textContent: hl.slice(0, i + 1) }, 0.8 + i * 0.06);
+        tl.set("#s1 .hl", { textContent: hl.slice(0, i + 1) }, 1.0 + i * 0.06);
       });
+      // shimmer sweep across hook (after typing done at ~2s)
+      tl.fromTo("#s1 .shimmer-sweep-target",
+        { "--shimmer-pos": "-20%" }, { "--shimmer-pos": "120%", duration: 1.4, ease: "power2.inOut" }, 2.4);
       tl.to("#s1", { opacity: 0, duration: 0.4 }, 5.6);
       tl.set("#s1", { opacity: 0 }, 6.0);
 
-      // ── Scene 2 ──
+      // ── Scene 2: Refero metadata cards (3D rotateX entry) ──
       tl.to("#s2", { opacity: 1, duration: 0.5 }, 6.2);
+      tl.fromTo("#s2", { scale: 0.96 }, { scale: 1.0, duration: 0.8, ease: "power3.out" }, 6.2);
       tl.to("#s2 .c1, #s2 .c2, #s2 .c3, #s2 .c4",
-        { opacity: 1, y: 0, duration: 0.6, stagger: 0.18, ease: "power3.out" }, 6.5);
+        { opacity: 1, y: 0, rotateX: 0, duration: 0.7, stagger: 0.16, ease: "power3.out" }, 6.5);
+      // count up + glow burst on completion
       tl.to({ val: 0 }, {
         val: 125000, duration: 1.6, ease: "power2.out",
         onUpdate: function() {
@@ -212,29 +322,46 @@
           if (el) el.textContent = n.toLocaleString();
         },
       }, 7.6);
+      // burst pulse on c4 when number lands
+      tl.to("#s2 .c4", { scale: 1.05, duration: 0.25, ease: "power2.out" }, 9.2);
+      tl.to("#s2 .c4", { scale: 1.0, duration: 0.5, ease: "power2.inOut" }, 9.45);
+      tl.to("#s2 .c4", { className: "card c4 glow", duration: 0 }, 9.2);
+      // subtle ken-burns on whole scene 2
+      tl.fromTo("#s2", { scale: 1.0 }, { scale: 1.025, duration: 6, ease: "none" }, 6.2);
       tl.to("#s2", { opacity: 0, duration: 0.4 }, 11.6);
       tl.set("#s2", { opacity: 0 }, 12.0);
 
-      // ── Scene 3 ──
+      // ── Scene 3: Pipeline (3D rotateY entry + drawing arrows) ──
       tl.to("#s3", { opacity: 1, duration: 0.5 }, 12.2);
-      tl.to("#s3 .st1", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 12.4);
-      tl.to("#s3 .ar1", { opacity: 1, duration: 0.3 }, 12.8);
-      tl.to("#s3 .st2", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 13.0);
-      tl.to("#s3 .ar2", { opacity: 1, duration: 0.3 }, 13.4);
-      tl.to("#s3 .st3", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 13.6);
-      tl.to("#s3 .ar3", { opacity: 1, duration: 0.3 }, 14.0);
-      tl.to("#s3 .st4", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 14.2);
+      tl.fromTo("#s3", { scale: 1.0 }, { scale: 1.03, duration: 6, ease: "none" }, 12.2);
+
+      const stepTimes = [12.4, 13.0, 13.6, 14.2];
+      const arrowTimes = [12.85, 13.45, 14.05];
+      tl.to("#s3 .st1", { opacity: 1, y: 0, rotateY: 0, duration: 0.55, ease: "power3.out" }, stepTimes[0]);
+      tl.to("#s3 .ar1", { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, arrowTimes[0]);
+      tl.to("#s3 .st2", { opacity: 1, y: 0, rotateY: 0, duration: 0.55, ease: "power3.out" }, stepTimes[1]);
+      tl.to("#s3 .ar2", { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, arrowTimes[1]);
+      tl.to("#s3 .st3", { opacity: 1, y: 0, rotateY: 0, duration: 0.55, ease: "power3.out" }, stepTimes[2]);
+      tl.to("#s3 .ar3", { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, arrowTimes[2]);
+      tl.to("#s3 .st4", { opacity: 1, y: 0, rotateY: 0, duration: 0.55, ease: "back.out(1.4)" }, stepTimes[3]);
+      // pulse all steps once landed
+      tl.to("#s3 .step", { scale: 1.02, duration: 0.3, stagger: 0.05, yoyo: true, repeat: 1, ease: "power2.inOut" }, 15.2);
       tl.to("#s3", { opacity: 0, duration: 0.4 }, 17.6);
       tl.set("#s3", { opacity: 0 }, 18.0);
 
-      // ── Scene 4 ──
+      // ── Scene 4: Brand close (camera pull-back + shimmer + scale settle) ──
       tl.to("#s4", { opacity: 1, duration: 0.5 }, 18.2);
+      // Wordmark starts BIG and settles to 1
+      tl.fromTo("#s4 .wordmark", { scale: 1.5, opacity: 0.5 }, { scale: 1.0, opacity: 1, duration: 1.2, ease: "power3.out" }, 18.4);
       tl.to("#s4 .ch",
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out" }, 18.5);
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.05, ease: "power3.out" }, 18.5);
+      // shimmer sweep across wordmark
+      tl.fromTo("#s4 .shimmer-sweep-target",
+        { "--shimmer-pos": "-20%" }, { "--shimmer-pos": "120%", duration: 1.6, ease: "power2.inOut" }, 19.4);
       tl.to("#s4 .tagline",
-        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 19.6);
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 19.8);
       tl.to("#s4 .pill",
-        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 20.2);
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.6)" }, 20.4);
 
       window.__timelines["main"] = tl;
     </script>
