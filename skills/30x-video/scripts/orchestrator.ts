@@ -151,13 +151,21 @@ export async function executePhase(opts: ExecuteOptions): Promise<DeliveryManife
     outputMp4Path: videoPath,
   });
 
-  // [8] Finish Gate — STUB for now (would invoke critique-scenes.ts +
-  // visual-audit.ts + timing-audit.ts and check pass conditions)
-  const finishGateResult = {
-    passed: true,
-    iterations: 1,
-    notes: ["Finish Gate auto-critique — TBD: integrate scripts/critique-scenes.ts"],
-  };
+  // [8] Finish Gate — auto-critique via hyperframes lint + inspect + taste timing
+  const { runFinishGate } = await import("./finish-gate.ts");
+  const finishGateResult = await runFinishGate({
+    projectDir,
+    script,
+    composition: plan.composition,
+  });
+
+  // [9] Iterate (max 2 retries) — TBD when LLM critique loop integrated
+  // For now: surface failure to user with explicit reasoning per SKILL.md
+  if (!finishGateResult.passed) {
+    console.error("Finish Gate FAILED. Notes:");
+    for (const note of finishGateResult.notes) console.error(`  - ${note}`);
+    console.error("Manual review required. Iterate by adjusting the plan and re-running.");
+  }
 
   // [9] Manifest
   const manifest: DeliveryManifest = {
@@ -171,7 +179,11 @@ export async function executePhase(opts: ExecuteOptions): Promise<DeliveryManife
       vo: voAsset,
       bgm: bgmAsset!,
     },
-    finishGateResult,
+    finishGateResult: {
+      passed: finishGateResult.passed,
+      iterations: finishGateResult.iterations,
+      notes: finishGateResult.notes,
+    },
   };
 
   writeFileSync(
