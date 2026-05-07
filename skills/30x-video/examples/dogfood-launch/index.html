@@ -4,86 +4,239 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
     <title>30x-video Dogfood Launch</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block"
+    />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
+      :root {
+        /* Refero MCP query "Linear minimalist dark mode product" → real tokens */
+        --bg: #131413;
+        --surface: #1d1f24;
+        --border: #2a2c30;
+        --text: #f3f8f8;
+        --text-dim: #909398;
+        --accent: #5e6cd0;
+        --accent-soft: rgba(94, 108, 208, 0.18);
+      }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body {
-        margin: 0;
         width: 1920px;
         height: 1080px;
         overflow: hidden;
-        background: #131413;
+        background: var(--bg);
+        color: var(--text);
         font-family: 'Inter', sans-serif;
+        font-feature-settings: 'cv11', 'ss01';
       }
-      .layer {
+      .scene {
         position: absolute;
         inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        padding: 120px 160px;
       }
-      /* Hide HyperFrames watermarks embedded in catalog blocks */
-      [data-composition-id="vfx-text-cursor"] .stage-logo-wrap,
-      [data-composition-id="vfx-text-cursor"] .stage-logo,
-      [data-composition-id="vfx-text-cursor"] .vfx-stage-logo {
-        display: none !important;
-      }
-      /* Force dark theme bgs across all blocks (defensive override) */
-      [data-composition-id="data-chart"],
-      [data-composition-id="flowchart"],
-      [data-composition-id="logo-outro"],
-      [data-composition-id="vfx-text-cursor"] {
-        background: #131413 !important;
-      }
+
+      /* ──────── Scene 1: Hook ──────── */
+      #s1 .stack { display: flex; flex-direction: column; gap: 40px; max-width: 1400px; }
+      #s1 .label { font-family: 'JetBrains Mono', monospace; font-size: 28px;
+        color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; }
+      #s1 .prompt { font-size: 96px; font-weight: 500; line-height: 1.15;
+        letter-spacing: -0.025em; color: var(--text); }
+      #s1 .prompt .hl { color: var(--accent); }
+      #s1 .cursor { display: inline-block; width: 6px; height: 88px;
+        background: var(--accent); vertical-align: middle; margin-left: 8px;
+        transform: translateY(8px); }
+
+      /* ──────── Scene 2: Refero metadata ──────── */
+      #s2 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+        max-width: 1400px; width: 100%; }
+      #s2 .card { background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 40px 44px; opacity: 0; transform: translateY(24px); }
+      #s2 .card-label { font-family: 'JetBrains Mono', monospace; font-size: 22px;
+        color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;
+        margin-bottom: 20px; }
+      #s2 .card-value { font-size: 56px; font-weight: 500; letter-spacing: -0.02em;
+        line-height: 1.1; }
+      #s2 .card-sub { font-family: 'JetBrains Mono', monospace; font-size: 20px;
+        color: var(--text-dim); margin-top: 12px; }
+      #s2 .card .accent { color: var(--accent); }
+
+      /* ──────── Scene 3: Pipeline ──────── */
+      #s3 .pipeline { display: flex; align-items: center; justify-content: center;
+        gap: 24px; max-width: 1700px; width: 100%; }
+      #s3 .step { background: var(--surface); border: 1px solid var(--border);
+        border-radius: 14px; padding: 28px 32px; flex: 1; opacity: 0;
+        transform: translateY(24px); display: flex; flex-direction: column; gap: 8px; }
+      #s3 .step-name { font-family: 'JetBrains Mono', monospace; font-size: 22px;
+        color: var(--accent); letter-spacing: 0.06em; }
+      #s3 .step-desc { font-size: 28px; font-weight: 500; color: var(--text); line-height: 1.25; }
+      #s3 .arrow { color: var(--text-dim); font-size: 32px; opacity: 0; }
+
+      /* ──────── Scene 4: Brand close ──────── */
+      #s4 .brand-stack { display: flex; flex-direction: column; align-items: center;
+        gap: 36px; text-align: center; }
+      #s4 .wordmark { font-family: 'Inter', sans-serif; font-size: 200px;
+        font-weight: 600; letter-spacing: -0.04em; line-height: 1; color: var(--text);
+        display: flex; }
+      #s4 .wordmark .ch { display: inline-block; opacity: 0; transform: translateY(40px); }
+      #s4 .wordmark .sep { color: var(--accent); font-weight: 400; padding: 0 8px; }
+      #s4 .tagline { font-size: 56px; font-weight: 400; letter-spacing: -0.015em;
+        color: var(--text-dim); opacity: 0; transform: translateY(20px); }
+      #s4 .tagline .accent { color: var(--accent); font-weight: 500; }
+      #s4 .pill { display: inline-flex; padding: 12px 28px;
+        background: var(--accent-soft); border: 1px solid rgba(94,108,208,0.4);
+        border-radius: 100px; font-family: 'JetBrains Mono', monospace;
+        font-size: 22px; color: var(--accent); letter-spacing: 0.06em;
+        opacity: 0; transform: translateY(15px); }
     </style>
   </head>
   <body>
-    <div
-      id="root"
-      data-composition-id="main"
-      data-start="0"
-      data-duration="24"
-      data-width="1920"
-      data-height="1080"
-    >
-      <!--
-        4 catalog blocks composed via data-composition-src:
-          0-8s   vfx-text-cursor   "a video" shader-rendered text reveal
-          8-15s  data-chart        Refero design metadata as chart
-          15-19s flowchart         pipeline diagram with SVG + typing
-          19-24s logo-outro        cinematic 30x-video brand reveal
-      -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22"
+         data-width="1920" data-height="1080">
 
-      <div class="layer clip"
-        data-composition-id="hook"
-        data-composition-src="compositions/vfx-text-cursor.html"
-        data-start="0" data-duration="8"
-        data-width="1920" data-height="1080" data-track-index="10"></div>
+      <!-- ───── Scene 1 (0-6s): Hook ───── -->
+      <div class="clip scene" id="s1" data-start="0" data-duration="6"
+           data-width="1920" data-height="1080" data-track-index="10">
+        <div class="stack">
+          <div class="label">You</div>
+          <div class="prompt">
+            Make a 15s social about <span class="hl"></span><span class="cursor"></span>
+          </div>
+        </div>
+      </div>
 
-      <div class="layer clip"
-        data-composition-id="metadata"
-        data-composition-src="compositions/data-chart.html"
-        data-start="8" data-duration="7"
-        data-width="1920" data-height="1080" data-track-index="20"></div>
+      <!-- Removed light-leak transition block — it has visible "LIGHT LEAK"
+           label + tutorial text overlay. Catalog transition blocks are demos
+           of themselves, not invisible transition primitives. Pure opacity
+           crossfade between scenes is cleaner. -->
 
-      <div class="layer clip"
-        data-composition-id="pipeline"
-        data-composition-src="compositions/flowchart.html"
-        data-start="15" data-duration="4"
-        data-width="1920" data-height="1080" data-track-index="30"></div>
 
-      <div class="layer clip"
-        data-composition-id="outro"
-        data-composition-src="compositions/logo-outro.html"
-        data-start="19" data-duration="5"
-        data-width="1920" data-height="1080" data-track-index="40"></div>
+      <!-- ───── Scene 2 (6-12s): Refero metadata ───── -->
+      <div class="clip scene" id="s2" data-start="6" data-duration="6"
+           data-width="1920" data-height="1080" data-track-index="11">
+        <div class="grid">
+          <div class="card c1">
+            <div class="card-label">font</div>
+            <div class="card-value">Inter</div>
+            <div class="card-sub">across 514 screens</div>
+          </div>
+          <div class="card c2">
+            <div class="card-label">accent</div>
+            <div class="card-value accent">#5E6CD0</div>
+            <div class="card-sub">Linear · indigo · system</div>
+          </div>
+          <div class="card c3">
+            <div class="card-label">archetype</div>
+            <div class="card-value">System Clarity</div>
+            <div class="card-sub">dark surfaces · cool neutrals</div>
+          </div>
+          <div class="card c4">
+            <div class="card-label">screens</div>
+            <div class="card-value"><span class="count accent" data-target="125000">0</span><span class="accent">+</span></div>
+            <div class="card-sub">refero.search_screens()</div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Removed cinematic-zoom transition block (same reason as light-leak above). -->
+
+
+      <!-- ───── Scene 3 (12-18s): Pipeline ───── -->
+      <div class="clip scene" id="s3" data-start="12" data-duration="6"
+           data-width="1920" data-height="1080" data-track-index="12">
+        <div class="pipeline">
+          <div class="step st1"><div class="step-name">brief</div><div class="step-desc">your sentence</div></div>
+          <div class="arrow ar1">→</div>
+          <div class="step st2"><div class="step-name">refero</div><div class="step-desc">design tokens</div></div>
+          <div class="arrow ar2">→</div>
+          <div class="step st3"><div class="step-name">script</div><div class="step-desc">scene HTML</div></div>
+          <div class="arrow ar3">→</div>
+          <div class="step st4"><div class="step-name">render</div><div class="step-desc">MP4 file</div></div>
+        </div>
+      </div>
+
+      <!-- Removed light-leak transition block (same reason as above). -->
+
+
+      <!-- ───── Scene 4 (18-22s): Brand ───── -->
+      <div class="clip scene" id="s4" data-start="18" data-duration="4"
+           data-width="1920" data-height="1080" data-track-index="13">
+        <div class="brand-stack">
+          <div class="wordmark">
+            <span class="ch">3</span><span class="ch">0</span><span class="ch">x</span><span class="ch sep">/</span><span class="ch">v</span><span class="ch">i</span><span class="ch">d</span><span class="ch">e</span><span class="ch">o</span>
+          </div>
+          <div class="tagline">Tell it what you want. <span class="accent">Get a video.</span></div>
+          <div class="pill">github.com/30x-video</div>
+        </div>
+      </div>
+
+      <!-- Continuous grain overlay -->
+      <div class="layer clip" data-composition-id="grain"
+           data-composition-src="compositions/components/grain-overlay.html"
+           data-start="0" data-duration="22"
+           data-width="1920" data-height="1080" data-track-index="99"></div>
+
+      <!-- Audio -->
       <audio class="clip" id="vo-track" src="assets/vo.wav"
-        data-start="0" data-duration="24" data-track-index="80" preload="auto"></audio>
+             data-start="0" data-duration="22" data-track-index="80" preload="auto"></audio>
       <audio class="clip" id="bgm-track" src="assets/bgm.mp3"
-        data-start="0" data-duration="24" data-track-index="70" preload="auto"></audio>
+             data-start="0" data-duration="22" data-track-index="70" preload="auto"></audio>
     </div>
 
     <script>
       window.__timelines = window.__timelines || {};
-      window.__timelines["main"] = gsap.timeline({ paused: true });
+      const tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 ──
+      tl.to("#s1", { opacity: 1, duration: 0.5 }, 0);
+      const hl = "morning routines";
+      hl.split("").forEach((_, i) => {
+        tl.set("#s1 .hl", { textContent: hl.slice(0, i + 1) }, 0.8 + i * 0.06);
+      });
+      tl.to("#s1", { opacity: 0, duration: 0.4 }, 5.6);
+      tl.set("#s1", { opacity: 0 }, 6.0);
+
+      // ── Scene 2 ──
+      tl.to("#s2", { opacity: 1, duration: 0.5 }, 6.2);
+      tl.to("#s2 .c1, #s2 .c2, #s2 .c3, #s2 .c4",
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.18, ease: "power3.out" }, 6.5);
+      tl.to({ val: 0 }, {
+        val: 125000, duration: 1.6, ease: "power2.out",
+        onUpdate: function() {
+          const n = Math.round(this.targets()[0].val);
+          const el = document.querySelector("#s2 .count");
+          if (el) el.textContent = n.toLocaleString();
+        },
+      }, 7.6);
+      tl.to("#s2", { opacity: 0, duration: 0.4 }, 11.6);
+      tl.set("#s2", { opacity: 0 }, 12.0);
+
+      // ── Scene 3 ──
+      tl.to("#s3", { opacity: 1, duration: 0.5 }, 12.2);
+      tl.to("#s3 .st1", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 12.4);
+      tl.to("#s3 .ar1", { opacity: 1, duration: 0.3 }, 12.8);
+      tl.to("#s3 .st2", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 13.0);
+      tl.to("#s3 .ar2", { opacity: 1, duration: 0.3 }, 13.4);
+      tl.to("#s3 .st3", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 13.6);
+      tl.to("#s3 .ar3", { opacity: 1, duration: 0.3 }, 14.0);
+      tl.to("#s3 .st4", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 14.2);
+      tl.to("#s3", { opacity: 0, duration: 0.4 }, 17.6);
+      tl.set("#s3", { opacity: 0 }, 18.0);
+
+      // ── Scene 4 ──
+      tl.to("#s4", { opacity: 1, duration: 0.5 }, 18.2);
+      tl.to("#s4 .ch",
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out" }, 18.5);
+      tl.to("#s4 .tagline",
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 19.6);
+      tl.to("#s4 .pill",
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 20.2);
+
+      window.__timelines["main"] = tl;
     </script>
   </body>
 </html>
