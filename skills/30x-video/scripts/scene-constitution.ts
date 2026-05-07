@@ -93,7 +93,6 @@ export function inferDesignArchetype(report: BrandReport): ArchetypeSelection {
   if (
     infraHits >= 2
     || report.structureTruth.productType === "developer-platform"
-    || (productHits >= 3 && report.structureTruth.productType === "developer-platform")
   ) {
     rationale.push("Evidence points to developer, data, infra, or security credibility.");
     return {
