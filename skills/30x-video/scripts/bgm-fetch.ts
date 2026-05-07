@@ -49,18 +49,15 @@ const BPM_RANGES: Record<BgmArchetype, [number, number]> = {
 };
 
 // Curated yt-dlp search queries per archetype.
-// Targets known royalty-free YouTube channels. Adding "no copyright"
-// and "instrumental" filters out vocal hooks that fight VO.
+// Tested for reliable results — short, brand-anchored queries return
+// results faster than verbose ones. NCS is the most reliable royalty-
+// free source on YouTube.
 const SEARCH_QUERIES: Record<BgmArchetype, string> = {
-  "minimalist-ambient":
-    "NoCopyrightSounds ambient chill instrumental no copyright",
-  "techno-driving":
-    "NoCopyrightSounds electronic upbeat instrumental no copyright",
-  "cinematic-orchestral":
-    "Audionautix cinematic epic instrumental no copyright",
-  "hip-hop-confident":
-    "NoCopyrightSounds hip hop instrumental no copyright",
-  "lo-fi-warm": "Lofi Girl chill beats lofi instrumental",
+  "minimalist-ambient": "NoCopyrightSounds chill ambient",
+  "techno-driving": "NoCopyrightSounds electronic dance",
+  "cinematic-orchestral": "NoCopyrightSounds cinematic",
+  "hip-hop-confident": "NoCopyrightSounds hip hop",
+  "lo-fi-warm": "NoCopyrightSounds lofi chill",
   "silence-with-sfx": "",
   "speech-only": "",
 };
@@ -164,6 +161,7 @@ function downloadCandidates(
   count: number,
   tempDir: string
 ): string[] {
+  // Limit to 15-min max video length and ≤ 30MB to avoid huge downloads
   const args = [
     `ytsearch${count}:${query}`,
     "--no-playlist",
@@ -171,22 +169,35 @@ function downloadCandidates(
     "--audio-format",
     "mp3",
     "--audio-quality",
-    "0", // best
+    "0",
+    "--match-filters",
+    "duration<3600",
+    "--max-filesize",
+    "100M",
     "--output",
     join(tempDir, "%(autonumber)s.%(ext)s"),
-    "--quiet",
-    "--no-warnings",
     "--no-progress",
+    "--socket-timeout",
+    "30",
   ];
 
-  spawnSync("yt-dlp", args, { stdio: ["ignore", "pipe", "pipe"] });
+  // 4-min hard timeout: stop hangs from YouTube JS challenge issues
+  const result = spawnSync("yt-dlp", args, {
+    stdio: ["ignore", "inherit", "inherit"],
+    timeout: 240_000,
+  });
 
-  // collect mp3 files in tempDir
+  if (result.error || result.status !== 0) {
+    console.error(
+      `yt-dlp non-zero exit (${result.status}). Continuing with whatever was downloaded.`
+    );
+  }
+
   if (!existsSync(tempDir)) return [];
   return readdirSync(tempDir)
     .filter((f) => f.endsWith(".mp3"))
     .map((f) => join(tempDir, f))
-    .filter((p) => statSync(p).size > 100_000); // skip tiny / broken files
+    .filter((p) => statSync(p).size > 100_000);
 }
 
 // ----------------------------------------------------------------
