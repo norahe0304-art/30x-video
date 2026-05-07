@@ -1,94 +1,134 @@
 /**
  * [INPUT]: VideoScript scenes with voLine, VoArchetype
- * [OUTPUT]: VoAsset (wav file path + duration + provider info)
- * [POS]: scripts/ pipeline 第 [5] 步; 多供应商 TTS 适配
+ * [OUTPUT]: VoAsset (wav file path + duration)
+ * [POS]: scripts/ pipeline 第 [5] 步; TTS via hyperframes-media (Kokoro)
  * [PROTOCOL]: 变更时更新此头部，然后检查 SKILL.md
  */
 
 // ================================================================
-//  VO Synthesizer — multi-provider TTS
+//  VO Synthesizer — single provider via hyperframes-media
 //
-//  Provider priority (fall back if previous unavailable):
-//    1. Kokoro (local, free) — default
-//    2. ElevenLabs (paid, highest quality) — if ELEVENLABS_API_KEY set
-//    3. OpenAI TTS — if OPENAI_API_KEY set
+//  Hyperframes ships a hyperframes-media skill with Kokoro TTS built
+//  in. We use it as the single source. No multi-provider switching
+//  — if you need higher-quality voices, upgrade hyperframes-media
+//  and every skill depending on it benefits.
 //
-//  This module is a STUB for now. Full implementation requires:
-//    - hyperframes-media skill installed for Kokoro
-//    - ElevenLabs / OpenAI HTTP clients
-//    - ffmpeg for concat + duration measurement
+//  Why single provider:
+//  - Multi-provider = N bugs × N maintenance × user-facing choice friction
+//  - Kokoro is free, local, and good enough for v1
+//  - Upgrade path = upgrade hyperframes-media, not 30x-video
 // ================================================================
 
-import type { VoArchetype, VoAsset, VideoScript } from "./types.ts";
+import { spawn } from "child_process";
+import type { VideoScript, VoArchetype, VoAsset } from "./types.ts";
 
 export interface VoSynthOptions {
   script: VideoScript;
   archetype: VoArchetype;
   outputPath: string;
-  provider?: "kokoro" | "elevenlabs" | "openai";
   voice?: string;
 }
 
-interface VoiceRegistry {
-  kokoro: Record<VoArchetype, string>;
-  elevenlabs: Record<VoArchetype, string>;
-  openai: Record<VoArchetype, string>;
-}
+// ----------------------------------------------------------------
+//  Voice mapping: archetype → Kokoro voice name
+// ----------------------------------------------------------------
 
-const VOICE_REGISTRY: VoiceRegistry = {
-  kokoro: {
-    none: "",
-    "conversational-host": "bella",
-    "authoritative-narrator": "chris",
-    "character-voice": "sarah",
-    "multi-speaker": "bella",
-  },
-  elevenlabs: {
-    none: "",
-    "conversational-host": "Rachel",
-    "authoritative-narrator": "Antoni",
-    "character-voice": "Daniel",
-    "multi-speaker": "Rachel",
-  },
-  openai: {
-    none: "",
-    "conversational-host": "nova",
-    "authoritative-narrator": "onyx",
-    "character-voice": "shimmer",
-    "multi-speaker": "nova",
-  },
+const VOICE_MAP: Record<VoArchetype, string> = {
+  none: "",
+  "conversational-host": "bella",        // warm female
+  "authoritative-narrator": "chris",     // deep male narrator
+  "character-voice": "sarah",            // distinctive personality
+  "multi-speaker": "bella",              // primary, second voice swapped per scene
 };
 
-export function pickVoice(provider: VoSynthOptions["provider"], archetype: VoArchetype): string {
-  if (!provider) provider = "kokoro";
-  return VOICE_REGISTRY[provider][archetype] ?? "";
+export function pickVoice(archetype: VoArchetype): string {
+  return VOICE_MAP[archetype];
 }
 
-export function detectAvailableProvider(): "kokoro" | "elevenlabs" | "openai" {
-  if (process.env.ELEVENLABS_API_KEY) return "elevenlabs";
-  if (process.env.OPENAI_API_KEY) return "openai";
-  return "kokoro";
-}
+// ----------------------------------------------------------------
+//  Main synth — calls hyperframes-media via npx
+//
+//  Expected CLI shape (from hyperframes-media docs):
+//    npx hyperframes media tts --text "..." --voice <name> --output <wav>
+// ----------------------------------------------------------------
 
 export async function synthesizeVoiceOver(opts: VoSynthOptions): Promise<VoAsset> {
   if (opts.archetype === "none") {
     throw new Error("synthesizeVoiceOver called with archetype=none");
   }
 
-  const provider = opts.provider ?? detectAvailableProvider();
-  const voice = opts.voice ?? pickVoice(provider, opts.archetype);
+  const voice = opts.voice ?? pickVoice(opts.archetype);
+  const fullText = opts.script.scenes
+    .map((s) => s.voLine)
+    .filter((l): l is string => Boolean(l))
+    .join(" ");
 
-  // STUB: actual provider integration goes here
-  // For now, throw a helpful "not implemented" with guidance
-  throw new Error(
-    `VO synth not yet implemented. Provider chosen: ${provider} / voice: ${voice}.\n` +
-      `To implement:\n` +
-      `  - Kokoro: install hyperframes-media skill, call its TTS pipeline\n` +
-      `  - ElevenLabs: HTTP call to api.elevenlabs.io with ELEVENLABS_API_KEY\n` +
-      `  - OpenAI: HTTP call to api.openai.com/v1/audio/speech with OPENAI_API_KEY\n` +
-      `Output: wav file at ${opts.outputPath} + duration via ffprobe`
-  );
+  if (!fullText.trim()) {
+    throw new Error("No VO lines found in script — cannot synthesize empty VO.");
+  }
+
+  await runHyperframesTts({
+    text: fullText,
+    voice,
+    outputPath: opts.outputPath,
+  });
+
+  const durationSec = estimateVoDuration(opts.script);
+
+  return {
+    path: opts.outputPath,
+    durationSeconds: durationSec,
+    provider: "kokoro",
+    voice,
+    wpm: 150,
+  };
 }
+
+interface TtsCallOptions {
+  text: string;
+  voice: string;
+  outputPath: string;
+}
+
+async function runHyperframesTts(opts: TtsCallOptions): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const args = [
+      "hyperframes",
+      "media",
+      "tts",
+      "--text",
+      opts.text,
+      "--voice",
+      opts.voice,
+      "--output",
+      opts.outputPath,
+    ];
+    const child = spawn("npx", args, { stdio: "inherit" });
+
+    child.on("error", (err) => {
+      reject(
+        new Error(
+          `hyperframes-media TTS failed: ${err.message}\n` +
+            `Install: npm install hyperframes && npx hyperframes init`
+        )
+      );
+    });
+    child.on("exit", (code) => {
+      if (code === 0) resolve();
+      else
+        reject(
+          new Error(
+            `hyperframes-media TTS exited with code ${code}.\n` +
+              `Verify hyperframes-media skill is installed.`
+          )
+        );
+    });
+  });
+}
+
+// ----------------------------------------------------------------
+//  Helpers
+// ----------------------------------------------------------------
 
 export function estimateVoDuration(script: VideoScript, wpm = 150): number {
   const totalWords = script.scenes

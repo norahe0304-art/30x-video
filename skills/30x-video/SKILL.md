@@ -11,8 +11,8 @@ description: |
   outputs, live streaming setup, or video editing of user-uploaded clips
   without a creative brief.
 
-  RUNTIME: Requires hyperframes engine. Refero MCP recommended (auto-detects
-  if installed). TTS providers: Kokoro default, ElevenLabs / OpenAI optional.
+  RUNTIME: Requires hyperframes engine (which ships hyperframes-media for
+  TTS via Kokoro). Refero MCP recommended (auto-detects if installed).
 ---
 
 <!--
@@ -225,7 +225,7 @@ Once approved, generate scene-by-scene shotlist:
 
 ### [5] Asset Producer (parallel)
 
-- **VO:** call TTS provider (Kokoro default → ElevenLabs / OpenAI on request)
+- **VO:** call hyperframes-media TTS (Kokoro). One provider, no switching.
 - **BGM:** fetch royalty-free track matching mood + tempo, run aubiotrack BPM detection
 - **Visuals:**
   - Hyperframes HTML/CSS animations (UI mockups, typography, transitions)
@@ -288,7 +288,7 @@ output/{job-id}/
 |-------|--------|-------|
 | Engine | hyperframes | Apache 2.0, single-machine, HTML+GSAP |
 | Design library | Refero MCP | 4 tools: `refero_search_screens`, `refero_get_screen`, `refero_search_flows`, `refero_get_flow` |
-| TTS | Kokoro / ElevenLabs / OpenAI | Multi-provider with graceful fallback |
+| TTS | Kokoro via hyperframes-media | Single provider — upgrade hyperframes-media if higher quality needed |
 | BGM | royalty-free + yt-dlp | aubiotrack for BPM detection |
 | Critique | LLM (Claude / GPT) | Auto-iterate ≤ 2 times |
 
@@ -321,7 +321,7 @@ skills/30x-video/
 ## Failure Modes (when to surface to user, not retry silently)
 
 - Refero MCP unavailable AND no brand specified AND no creator preset matches
-- TTS providers all unreachable
+- hyperframes-media TTS unreachable (skill not installed or Kokoro init failed)
 - BGM fetch fails after 3 retries
 - Finish Gate fails 2 consecutive iterations
 - User-provided asset format unsupported

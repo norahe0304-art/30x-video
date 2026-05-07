@@ -210,7 +210,7 @@ export interface VideoScript {
 export interface VoAsset {
   path: string;
   durationSeconds: number;
-  provider: "kokoro" | "elevenlabs" | "openai";
+  provider: "kokoro"; // single provider via hyperframes-media
   voice: string;
   wpm: number;
 }

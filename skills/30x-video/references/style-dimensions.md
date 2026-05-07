@@ -93,22 +93,23 @@ No voice over. On-screen text + BGM carry the narrative.
 Warm, intimate, like a friend explaining something. Mid-range pitch,
 natural pacing.
 - **Use for:** creator content, tutorials, brand films with relatable tone
-- **Voice models:** Kokoro `bella` / `michael`, ElevenLabs `Rachel` / `Adam`
+- **Kokoro voice:** `bella`
 
 ### authoritative-narrator
 Confident, measured, like a documentary narrator. Deeper pitch, deliberate
 pacing.
 - **Use for:** product launches, brand films, premium positioning
-- **Voice models:** Kokoro `chris`, ElevenLabs `Antoni` / `Daniel`, OpenAI `onyx`
+- **Kokoro voice:** `chris`
 
 ### character-voice
 Distinctive personality. Could be playful, dramatic, intentionally weird.
 - **Use for:** brand films with strong personality, social-first creative
-- **Voice models:** ElevenLabs has best variety here
+- **Kokoro voice:** `sarah`
 
 ### multi-speaker
 Two voices in dialogue. Interview-style or conversation.
 - **Use for:** testimonials, panels, before-after dialogue
+- **Kokoro voices:** `bella` + `chris` swapped per scene
 - **Note:** more complex to time and align — only when narrative requires it
 
 ## Dim 5 — Format (4 options)

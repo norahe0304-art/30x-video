@@ -67,7 +67,7 @@ brief
 | Render engine | [hyperframes](https://github.com/heygen-com/hyperframes) (Apache 2.0) |
 | Design library | [Refero MCP](https://refero.design/mcp) |
 | DESIGN.md source | [VoltAgent awesome-design-md](https://github.com/voltagent/awesome-design-md) via `npx getdesign` |
-| TTS / VO | Kokoro (default) → ElevenLabs / OpenAI (premium) |
+| TTS / VO | Kokoro via hyperframes-media (single provider) |
 | BGM | Royalty-free pool + yt-dlp + aubiotrack BPM detection |
 | Beat sync | aubiotrack |
 | Critique | LLM (Claude / GPT) |
