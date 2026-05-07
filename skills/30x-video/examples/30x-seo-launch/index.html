@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>30x-seo Launch</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=block"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #000000;
+        --text: #ffffff;
+        --text-2: #d4d4d4;
+        --text-dim: #6b7280;
+        --accent: #00d97e;
+        --grid-line: rgba(255,255,255,0.06);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: var(--bg); color: var(--text);
+        font-family: 'Inter', sans-serif;
+        font-feature-settings: 'cv11', 'ss01', 'tnum';
+      }
+      .scene { position: absolute; inset: 0; opacity: 0; z-index: 5; }
+
+      /* ─────── Frame 1: ASCII logo + tagline ─────── */
+      #f1 {
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 64px;
+      }
+      #f1 .ascii {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700; font-size: 64px; line-height: 1.0;
+        letter-spacing: 0;
+        color: var(--text);
+        white-space: pre;
+      }
+      #f1 .ascii .row {
+        display: block; opacity: 0; transform: translateY(20px);
+      }
+      #f1 .ascii .seo {
+        color: var(--accent);
+      }
+      #f1 .tagline {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 56px; font-weight: 500; letter-spacing: -0.02em;
+        color: var(--text-2);
+        opacity: 0; transform: translateY(20px);
+      }
+      #f1 .tagline .em { color: var(--accent); font-weight: 600; }
+
+      /* ─────── Frame 2: 9-category grid ─────── */
+      #f2 {
+        display: flex; flex-direction: column;
+        align-items: stretch; padding: 140px 200px;
+      }
+      #f2 .top-line {
+        display: flex; justify-content: space-between; align-items: baseline;
+        padding-bottom: 32px;
+        border-bottom: 1px solid var(--grid-line);
+        margin-bottom: 64px;
+      }
+      #f2 .ts {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 24px; color: var(--text-dim); letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0; transform: translateY(10px);
+      }
+      #f2 .total {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 32px; font-weight: 500; color: var(--text);
+        letter-spacing: -0.01em;
+        opacity: 0; transform: translateY(10px);
+      }
+      #f2 .total .num {
+        color: var(--accent); font-weight: 600;
+      }
+      #f2 .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px 80px;
+        flex: 1;
+      }
+      #f2 .cat {
+        display: flex; align-items: baseline; gap: 24px;
+        padding: 28px 0;
+        border-bottom: 1px solid var(--grid-line);
+        opacity: 0; transform: translateX(-30px);
+      }
+      #f2 .cat .idx {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 20px; color: var(--text-dim);
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+      }
+      #f2 .cat .name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 56px; font-weight: 500; letter-spacing: -0.02em;
+        color: var(--text);
+        line-height: 1;
+      }
+      #f2 .cat .count {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px; color: var(--text-dim);
+        margin-left: auto;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ─────── Frame 3: Terminal install ─────── */
+      #f3 {
+        display: flex; align-items: center; justify-content: center;
+        padding: 0 200px;
+      }
+      #f3 .terminal {
+        width: 100%; max-width: 1500px;
+        background: #0a0a0a;
+        border: 1px solid #1a1a1a;
+        border-radius: 16px;
+        padding: 48px 56px;
+        font-family: 'JetBrains Mono', monospace;
+        position: relative;
+      }
+      #f3 .terminal::before {
+        content: '';
+        position: absolute; top: 22px; left: 24px;
+        width: 14px; height: 14px; border-radius: 50%;
+        background: #ff5f57;
+        box-shadow: 24px 0 #febc2e, 48px 0 #28c840;
+      }
+      #f3 .prompt-line {
+        font-size: 42px; color: var(--text-dim);
+        line-height: 1.5;
+        margin-top: 32px;
+      }
+      #f3 .prompt-line .dollar { color: var(--accent); margin-right: 16px; }
+      #f3 .prompt-line .typed { color: var(--text); }
+      #f3 .cursor {
+        display: inline-block; width: 14px; height: 38px;
+        background: var(--text); vertical-align: middle;
+        margin-left: 4px; transform: translateY(2px);
+      }
+      #f3 .output-line {
+        font-size: 28px; color: var(--text-dim);
+        line-height: 1.6; opacity: 0;
+        margin-top: 4px;
+      }
+      #f3 .output-line .ok {
+        color: var(--accent); font-weight: 500;
+      }
+      #f3 .output-line .file { color: var(--text-2); }
+
+      /* ─────── Frame 4: Brand close ─────── */
+      #f4 {
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 48px; padding: 0 200px;
+      }
+      #f4 .label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 24px; color: var(--accent); letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0; transform: translateY(15px);
+      }
+      #f4 .wordmark {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 280px; font-weight: 700; letter-spacing: -0.05em;
+        line-height: 1;
+        opacity: 0; transform: scale(1.4);
+      }
+      #f4 .wordmark .seo { color: var(--accent); }
+      #f4 .pillars {
+        display: flex; gap: 48px; align-items: baseline;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 44px; font-weight: 400; letter-spacing: -0.01em;
+        color: var(--text-2);
+        opacity: 0; transform: translateY(20px);
+      }
+      #f4 .pillars .dot { color: var(--text-dim); font-size: 36px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22"
+         data-width="1920" data-height="1080">
+
+      <!-- ───── Frame 1 (0-4s): ASCII logo + tagline ───── -->
+      <div class="clip scene" id="f1" data-start="0" data-duration="4"
+           data-width="1920" data-height="1080" data-track-index="10">
+        <div class="ascii"><span class="row r1">██████╗  ██████╗ ██╗  ██╗    <span class="seo">███████╗███████╗ ██████╗</span></span>
+<span class="row r2">╚════██╗██╔═══██╗╚██╗██╔╝    <span class="seo">██╔════╝██╔════╝██╔═══██╗</span></span>
+<span class="row r3"> █████╔╝██║   ██║ ╚███╔╝     <span class="seo">███████╗█████╗  ██║   ██║</span></span>
+<span class="row r4"> ╚═══██╗██║   ██║ ██╔██╗     <span class="seo">╚════██║██╔══╝  ██║   ██║</span></span>
+<span class="row r5">██████╔╝╚██████╔╝██╔╝ ██╗    <span class="seo">███████║███████╗╚██████╔╝</span></span>
+<span class="row r6">╚═════╝  ╚═════╝ ╚═╝  ╚═╝    <span class="seo">╚══════╝╚══════╝ ╚═════╝</span></span></div>
+        <div class="tagline">Built for <span class="em">Claude Code</span>.</div>
+      </div>
+
+      <!-- ───── Frame 2 (4-10s): 9-category grid ───── -->
+      <div class="clip scene" id="f2" data-start="4" data-duration="6"
+           data-width="1920" data-height="1080" data-track-index="11">
+        <div class="top-line">
+          <div class="ts">9 CATEGORIES</div>
+          <div class="total"><span class="num">24</span> production-ready skills</div>
+        </div>
+        <div class="grid">
+          <div class="cat c1"><span class="idx">01</span><span class="name">Audit</span><span class="count">1+CLI</span></div>
+          <div class="cat c2"><span class="idx">02</span><span class="name">Technical</span><span class="count">5</span></div>
+          <div class="cat c3"><span class="idx">03</span><span class="name">Links</span><span class="count">3</span></div>
+          <div class="cat c4"><span class="idx">04</span><span class="name">Content</span><span class="count">6</span></div>
+          <div class="cat c5"><span class="idx">05</span><span class="name">Planning</span><span class="count">2</span></div>
+          <div class="cat c6"><span class="idx">06</span><span class="name">Programmatic</span><span class="count">2</span></div>
+          <div class="cat c7"><span class="idx">07</span><span class="name">Monitoring</span><span class="count">3</span></div>
+          <div class="cat c8"><span class="idx">08</span><span class="name">Local</span><span class="count">1</span></div>
+          <div class="cat c9"><span class="idx">09</span><span class="name">Data</span><span class="count">1</span></div>
+        </div>
+      </div>
+
+      <!-- ───── Frame 3 (10-16s): Terminal install ───── -->
+      <div class="clip scene" id="f3" data-start="10" data-duration="6"
+           data-width="1920" data-height="1080" data-track-index="12">
+        <div class="terminal">
+          <div class="prompt-line">
+            <span class="dollar">$</span><span class="typed"></span><span class="cursor"></span>
+          </div>
+          <div class="output-line out1">
+            <span class="ok">✓</span> Installed <span class="file">norahe0304-art/30x-seo</span>
+          </div>
+          <div class="output-line out2">
+            <span class="ok">✓</span> 24 skills loaded
+          </div>
+          <div class="output-line out3">
+            <span class="ok">✓</span> 230+ audit rules ready
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Frame 4 (16-22s): Brand close ───── -->
+      <div class="clip scene" id="f4" data-start="16" data-duration="6"
+           data-width="1920" data-height="1080" data-track-index="13">
+        <div class="label">2026 · AI-native</div>
+        <div class="wordmark">30x-<span class="seo">seo</span></div>
+        <div class="pillars">
+          <span>AI Overviews</span>
+          <span class="dot">·</span>
+          <span>LLM citations</span>
+          <span class="dot">·</span>
+          <span>GEO ready</span>
+        </div>
+      </div>
+
+      <!-- Continuous grain overlay -->
+      <div class="layer clip" data-composition-id="grain"
+           data-composition-src="compositions/components/grain-overlay.html"
+           data-start="0" data-duration="22"
+           data-width="1920" data-height="1080" data-track-index="99"></div>
+
+      <audio class="clip" id="vo-track" src="assets/vo.wav"
+             data-start="0" data-duration="22" data-track-index="80" preload="auto"></audio>
+      <audio class="clip" id="bgm-track" src="assets/bgm.mp3"
+             data-start="0" data-duration="22" data-track-index="70" preload="auto"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* ════ FRAME 1 (0-4s): ASCII reveal + tagline ════ */
+      tl.to("#f1", { opacity: 1, duration: 0.3, ease: "none" }, 0);
+      tl.to("#f1 .ascii .row",
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.10, ease: "power3.out" }, 0.2);
+      tl.to("#f1 .tagline",
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.2);
+      tl.to("#f1", { opacity: 0, duration: 0.5, ease: "none" }, 3.5);
+
+      /* ════ FRAME 2 (4-10s): 9-category grid ════ */
+      tl.to("#f2", { opacity: 1, duration: 0.3, ease: "none" }, 4.0);
+      tl.to("#f2 .ts, #f2 .total",
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.1 }, 4.2);
+      tl.to("#f2 .grid .cat",
+        { opacity: 1, x: 0, duration: 0.45, stagger: 0.07, ease: "power3.out" }, 4.7);
+      tl.to("#f2", { opacity: 0, duration: 0.5, ease: "none" }, 9.5);
+
+      /* ════ FRAME 3 (10-16s): Terminal install ════ */
+      tl.to("#f3", { opacity: 1, duration: 0.3, ease: "none" }, 10.0);
+      const cmd = "npx skills add norahe0304-art/30x-seo";
+      cmd.split("").forEach((_, i) => {
+        tl.set("#f3 .typed", { textContent: cmd.slice(0, i + 1) }, 10.4 + i * 0.045);
+      });
+      const cmdEnd = 10.4 + cmd.length * 0.045;
+      tl.to("#f3 .out1", { opacity: 1, duration: 0.3 }, cmdEnd + 0.4);
+      tl.to("#f3 .out2", { opacity: 1, duration: 0.3 }, cmdEnd + 0.8);
+      tl.to("#f3 .out3", { opacity: 1, duration: 0.3 }, cmdEnd + 1.2);
+      tl.to("#f3", { opacity: 0, duration: 0.5, ease: "none" }, 15.5);
+
+      /* ════ FRAME 4 (16-22s): Brand close ════ */
+      tl.to("#f4", { opacity: 1, duration: 0.3, ease: "none" }, 16.0);
+      tl.to("#f4 .label", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 16.2);
+      tl.to("#f4 .wordmark",
+        { opacity: 1, scale: 1.0, duration: 1.0, ease: "power3.out" }, 16.5);
+      tl.to("#f4 .pillars",
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 17.6);
+      tl.to("#f4", { opacity: 0, duration: 1.0, ease: "none" }, 21.0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
