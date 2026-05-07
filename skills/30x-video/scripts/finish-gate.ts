@@ -31,6 +31,8 @@ export interface FinishGateInput {
   projectDir: string;
   script: VideoScript;
   composition: StyleComposition;
+  voPath?: string;
+  bgmPath?: string;
 }
 
 export interface FinishGateResult {
@@ -40,6 +42,24 @@ export interface FinishGateResult {
   lint: { passed: boolean; errors: number; warnings: number };
   inspect: { passed: boolean; overflowCount: number };
   timingAudit: { passed: boolean; violations: TimingViolation[] };
+  /** notebook 03 P0: anti-slop additional audits */
+  slopAudit?: SlopAuditResult;
+  bgmDucking?: BgmDuckingResult;
+}
+
+export interface SlopAuditResult {
+  passed: boolean;
+  forbiddenWordsFound: Array<{ word: string; sceneIndex: number; context: string }>;
+  voWpmExceeds175: boolean;
+  voWpmActual: number;
+}
+
+export interface BgmDuckingResult {
+  passed: boolean;
+  voRmsLufs: number | null;
+  bgmRmsLufs: number | null;
+  separationDb: number | null;
+  reason: string;
 }
 
 export interface TimingViolation {
@@ -78,21 +98,48 @@ export async function runFinishGate(
   const lint = await runLint(input.projectDir);
   if (!lint.passed) notes.push(`Lint: ${lint.errors} errors, ${lint.warnings} warnings`);
 
-  // 2. Hyperframes inspect (text/container overflow)
+  // 2. Hyperframes inspect
   const inspect = await runInspect(input.projectDir);
   if (!inspect.passed) notes.push(`Inspect: ${inspect.overflowCount} overflow issues`);
 
-  // 3. Taste.md reading-time audit
+  // 3. Reading-time audit (taste.md)
   const timingAudit = auditTiming(input.script, input.composition);
   if (!timingAudit.passed) {
     for (const v of timingAudit.violations) {
       notes.push(
-        `Timing: scene ${v.sceneIndex} ${v.type} held ${v.current}s, min ${v.minimum}s (rule: ${v.rule})`
+        `Timing: scene ${v.sceneIndex} ${v.type} held ${v.current}s, min ${v.minimum}s`
       );
     }
   }
 
-  const passed = lint.passed && inspect.passed && timingAudit.passed;
+  // 4. notebook 03 P0: anti-slop word + VO speed audit
+  const slopAudit = auditSlop(input.script);
+  if (!slopAudit.passed) {
+    for (const f of slopAudit.forbiddenWordsFound) {
+      notes.push(`Slop word "${f.word}" in scene ${f.sceneIndex}: "${f.context}"`);
+    }
+    if (slopAudit.voWpmExceeds175) {
+      notes.push(`VO speed ${slopAudit.voWpmActual.toFixed(0)} wpm > 175 (anxious)`);
+    }
+  }
+
+  // 5. notebook 03 P0: BGM ducking audit (only if both audio paths given)
+  let bgmDucking: BgmDuckingResult | undefined;
+  if (input.voPath && input.bgmPath) {
+    bgmDucking = await auditBgmDucking(input.voPath, input.bgmPath);
+    if (!bgmDucking.passed) {
+      notes.push(
+        `BGM ducking: ${bgmDucking.reason} (separation=${bgmDucking.separationDb?.toFixed(1)}dB)`
+      );
+    }
+  }
+
+  const passed =
+    lint.passed &&
+    inspect.passed &&
+    timingAudit.passed &&
+    slopAudit.passed &&
+    (bgmDucking?.passed ?? true);
 
   return {
     passed,
@@ -101,7 +148,112 @@ export async function runFinishGate(
     lint,
     inspect,
     timingAudit,
+    slopAudit,
+    bgmDucking,
   };
+}
+
+// ----------------------------------------------------------------
+//  notebook 03 P0: Anti-slop word + VO speed audit
+// ----------------------------------------------------------------
+
+const SLOP_WORDS = [
+  "elevate", "unleash", "empower", "revolutionize", "transform",
+  "game-changer", "disrupt", "reimagine", "next-generation",
+  "best-in-class", "cutting-edge", "all-in-one solution",
+  "discover the future", "welcome to a new era",
+  "what if i told you", "imagine a world where",
+];
+
+function auditSlop(script: VideoScript): SlopAuditResult {
+  const forbiddenWordsFound: SlopAuditResult["forbiddenWordsFound"] = [];
+  let totalWords = 0;
+  let totalSeconds = 0;
+
+  for (const scene of script.scenes) {
+    const allText = `${scene.onScreenText ?? ""} ${scene.voLine ?? ""}`.toLowerCase();
+    for (const slop of SLOP_WORDS) {
+      if (allText.includes(slop.toLowerCase())) {
+        forbiddenWordsFound.push({
+          word: slop,
+          sceneIndex: scene.index,
+          context: (scene.onScreenText ?? scene.voLine ?? "").slice(0, 80),
+        });
+      }
+    }
+    if (scene.voLine) {
+      totalWords += scene.voLine.split(/\s+/).filter(Boolean).length;
+      totalSeconds += scene.durationSeconds;
+    }
+  }
+
+  const voWpm = totalSeconds > 0 ? (totalWords / totalSeconds) * 60 : 0;
+  const voWpmExceeds175 = voWpm > 175;
+
+  return {
+    passed: forbiddenWordsFound.length === 0 && !voWpmExceeds175,
+    forbiddenWordsFound,
+    voWpmExceeds175,
+    voWpmActual: voWpm,
+  };
+}
+
+// ----------------------------------------------------------------
+//  notebook 03 P0: BGM must duck -12 to -18 dB under VO
+//  Use ffmpeg's loudness measurement (ebur128) as proxy.
+// ----------------------------------------------------------------
+
+async function auditBgmDucking(
+  voPath: string,
+  bgmPath: string
+): Promise<BgmDuckingResult> {
+  const voLufs = await measureLoudness(voPath);
+  const bgmLufs = await measureLoudness(bgmPath);
+
+  if (voLufs === null || bgmLufs === null) {
+    return {
+      passed: false,
+      voRmsLufs: voLufs,
+      bgmRmsLufs: bgmLufs,
+      separationDb: null,
+      reason: "could not measure loudness on one or both tracks",
+    };
+  }
+
+  // VO should be louder than BGM. separation = voLufs - bgmLufs.
+  // Target: 12-18 dB separation. Less than 8 = BGM dominates.
+  const separation = voLufs - bgmLufs;
+  if (separation < 8) {
+    return {
+      passed: false,
+      voRmsLufs: voLufs,
+      bgmRmsLufs: bgmLufs,
+      separationDb: separation,
+      reason: "BGM too loud relative to VO (separation < 8dB)",
+    };
+  }
+  return {
+    passed: true,
+    voRmsLufs: voLufs,
+    bgmRmsLufs: bgmLufs,
+    separationDb: separation,
+    reason: "BGM properly ducked under VO",
+  };
+}
+
+async function measureLoudness(audioPath: string): Promise<number | null> {
+  return new Promise((resolve) => {
+    const result = spawnSync(
+      "ffmpeg",
+      ["-i", audioPath, "-af", "ebur128=peak=true", "-f", "null", "-"],
+      { encoding: "utf-8" }
+    );
+    const stderr = result.stderr ?? "";
+    // ebur128 prints "I:    -23.0 LUFS" near the end
+    const match = stderr.match(/I:\s*(-?\d+\.?\d*)\s*LUFS/);
+    if (match) resolve(parseFloat(match[1]));
+    else resolve(null);
+  });
 }
 
 // ----------------------------------------------------------------

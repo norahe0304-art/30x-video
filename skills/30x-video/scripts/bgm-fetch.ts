@@ -259,52 +259,76 @@ interface TrimLoopOpts {
 function trimOrLoopToDuration(opts: TrimLoopOpts): void {
   const sourceDuration = getAudioDuration(opts.sourcePath);
 
+  // notebook 03 P0: BGM must duck -12 to -18 dB under VO. Bake -18dB into
+  // the file at fetch time so even if downstream compositors don't respect
+  // <audio volume>, the music doesn't drown out narration.
+  // notebook 02 P0: align trim start to first DOWNBEAT (most stable
+  // 4-beat sequence start), not first arbitrary onset.
+  const downbeatSec = findDownbeat(opts.sourcePath, opts.firstBeatSec);
+
+  // afilter chain:
+  //   volume=-18dB        → BGM permanently quieter than VO
+  //   afade=in start fast → no abrupt cut-in
+  //   afade=out tail      → graceful end
+  const fadeOutStart = Math.max(0, opts.targetDuration - 1.5);
+  const filterChain = `volume=-18dB,afade=t=in:st=0:d=0.4,afade=t=out:st=${fadeOutStart}:d=1.5`;
+
   if (sourceDuration >= opts.targetDuration + 1) {
-    // trim: start at first beat to align with our timeline
-    const startSec = opts.firstBeatSec;
-    const args = [
+    runFfmpeg([
       "-y",
-      "-ss",
-      String(startSec),
-      "-i",
-      opts.sourcePath,
-      "-t",
-      String(opts.targetDuration),
-      "-acodec",
-      "libmp3lame",
-      "-b:a",
-      "192k",
-      "-af",
-      "afade=t=out:st=" +
-        String(opts.targetDuration - 1.5) +
-        ":d=1.5", // fade out last 1.5s
+      "-ss", String(downbeatSec),
+      "-i", opts.sourcePath,
+      "-t", String(opts.targetDuration),
+      "-acodec", "libmp3lame",
+      "-b:a", "192k",
+      "-af", filterChain,
       opts.outputPath,
-    ];
-    runFfmpeg(args);
+    ]);
     return;
   }
 
-  // loop: tile source until > target, then trim
   const loopCount = Math.ceil(opts.targetDuration / sourceDuration) + 1;
-  const args = [
+  runFfmpeg([
     "-y",
-    "-stream_loop",
-    String(loopCount),
-    "-i",
-    opts.sourcePath,
-    "-t",
-    String(opts.targetDuration),
-    "-acodec",
-    "libmp3lame",
-    "-b:a",
-    "192k",
-    "-af",
-    "afade=t=out:st=" +
-      String(opts.targetDuration - 1.5) +
-      ":d=1.5",
+    "-stream_loop", String(loopCount),
+    "-i", opts.sourcePath,
+    "-t", String(opts.targetDuration),
+    "-acodec", "libmp3lame",
+    "-b:a", "192k",
+    "-af", filterChain,
     opts.outputPath,
-  ];
-  runFfmpeg(args);
+  ]);
+}
+
+// notebook 02 P0: find a true downbeat (start of a 4-beat phrase),
+// not just any onset. Picks the onset whose next 8 inter-beat
+// intervals have the lowest variance — that's where the metronome
+// is most stable, i.e., the start of a phrase.
+function findDownbeat(audioPath: string, fallbackSec: number): number {
+  const result = spawnSync("aubiotrack", [audioPath], { encoding: "utf-8" });
+  if (result.status !== 0 || !result.stdout) return fallbackSec;
+  const beats = result.stdout
+    .split("\n")
+    .map((l) => parseFloat(l.trim()))
+    .filter((n) => !isNaN(n));
+  if (beats.length < 12) return fallbackSec;
+
+  // For each candidate beat (skipping first 2 to avoid edge), compute
+  // variance of next 8 inter-beat intervals.
+  let bestSec = fallbackSec;
+  let bestVar = Infinity;
+  for (let i = 2; i < beats.length - 9; i++) {
+    const intervals: number[] = [];
+    for (let j = i; j < i + 8; j++) intervals.push(beats[j + 1] - beats[j]);
+    const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    const variance =
+      intervals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / intervals.length;
+    if (variance < bestVar) {
+      bestVar = variance;
+      bestSec = beats[i];
+    }
+  }
+  return Math.max(0, bestSec - 0.05); // 50ms pre-roll
 }
 
 function runFfmpeg(args: string[]): void {
