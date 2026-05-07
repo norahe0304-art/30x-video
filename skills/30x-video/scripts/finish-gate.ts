@@ -245,12 +245,18 @@ async function measureLoudness(audioPath: string): Promise<number | null> {
   return new Promise((resolve) => {
     const result = spawnSync(
       "ffmpeg",
-      ["-i", audioPath, "-af", "ebur128=peak=true", "-f", "null", "-"],
+      ["-i", audioPath, "-af", "ebur128", "-f", "null", "-"],
       { encoding: "utf-8" }
     );
     const stderr = result.stderr ?? "";
-    // ebur128 prints "I:    -23.0 LUFS" near the end
-    const match = stderr.match(/I:\s*(-?\d+\.?\d*)\s*LUFS/);
+    // ebur128 emits per-window I: lines AND a final "Summary:" section.
+    // Earlier match grabbed the first per-window value (often silence at
+    // -70 LUFS during file intro). We want the Integrated loudness from
+    // the Summary block.
+    const summaryIdx = stderr.lastIndexOf("Summary:");
+    const tail = summaryIdx >= 0 ? stderr.slice(summaryIdx) : stderr;
+    // Look for "Integrated loudness:" then "I:    -23.0 LUFS"
+    const match = tail.match(/Integrated\s+loudness:[\s\S]*?I:\s*(-?\d+\.?\d*)\s*LUFS/);
     if (match) resolve(parseFloat(match[1]));
     else resolve(null);
   });

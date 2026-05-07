@@ -259,19 +259,19 @@ interface TrimLoopOpts {
 function trimOrLoopToDuration(opts: TrimLoopOpts): void {
   const sourceDuration = getAudioDuration(opts.sourcePath);
 
-  // notebook 03 P0: BGM must duck -12 to -18 dB under VO. Bake -18dB into
-  // the file at fetch time so even if downstream compositors don't respect
-  // <audio volume>, the music doesn't drown out narration.
-  // notebook 02 P0: align trim start to first DOWNBEAT (most stable
+  // notebook 03 P0: BGM must sit ~12-18 dB under VO. Tested -18dB volume
+  // reduction → still only 5dB separation (NCS source very loud). Switch
+  // to loudnorm targeting -36 LUFS — broadcast-style guaranteed level.
+  // notebook 02 P0: trim start aligned to first DOWNBEAT (most stable
   // 4-beat sequence start), not first arbitrary onset.
   const downbeatSec = findDownbeat(opts.sourcePath, opts.firstBeatSec);
 
   // afilter chain:
-  //   volume=-18dB        → BGM permanently quieter than VO
-  //   afade=in start fast → no abrupt cut-in
-  //   afade=out tail      → graceful end
+  //   loudnorm I=-36       → integrated loudness pinned at -36 LUFS
+  //                          (VO typically -21..-23 LUFS → 13-15 dB ducking)
+  //   afade in/out         → no abrupt cut-in / graceful tail
   const fadeOutStart = Math.max(0, opts.targetDuration - 1.5);
-  const filterChain = `volume=-18dB,afade=t=in:st=0:d=0.4,afade=t=out:st=${fadeOutStart}:d=1.5`;
+  const filterChain = `loudnorm=I=-36:LRA=11:TP=-2,afade=t=in:st=0:d=0.4,afade=t=out:st=${fadeOutStart}:d=1.5`;
 
   if (sourceDuration >= opts.targetDuration + 1) {
     runFfmpeg([
