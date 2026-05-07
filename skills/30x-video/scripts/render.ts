@@ -1,81 +1,92 @@
 /**
- * [INPUT]: Composed HTML file path + format + duration
- * [OUTPUT]: Final MP4 video
- * [POS]: scripts/ pipeline 第 [7] 步; 调 hyperframes engine 渲染
+ * [INPUT]: Hyperframes project directory
+ * [OUTPUT]: Final MP4 video file
+ * [POS]: scripts/ pipeline 第 [7] 步; 调 hyperframes render
  * [PROTOCOL]: 变更时更新此头部，然后检查 SKILL.md
  */
 
 // ================================================================
-//  Renderer — invoke Hyperframes engine
+//  Renderer — invoke `hyperframes render <project-dir>`
 //
-//  Hyperframes uses Puppeteer + FFmpeg to render seekable HTML
-//  compositions to MP4.
-//
-//  CLI invocation (when @hyperframes/cli is installed):
-//    npx hyperframes render <html> --output <mp4> --format <16:9|9:16|...> --duration <sec>
-//
-//  This module wraps the CLI call. Full integration once hyperframes
-//  is added as dev dependency.
+//  Hyperframes render takes a project DIRECTORY and produces an MP4
+//  in renders/<name>.mp4 by default, or a custom path with --output.
 // ================================================================
 
 import { spawn } from "child_process";
-import type { Format } from "./types.ts";
+import { existsSync } from "fs";
 
 export interface RenderInput {
-  htmlPath: string;
+  projectDir: string;
   outputMp4Path: string;
-  format: Format;
-  durationSeconds: number;
   fps?: number;
-  withVo?: boolean;
+  quality?: "draft" | "standard" | "high";
+  variables?: Record<string, unknown>;
+  strict?: boolean;
 }
 
-const DIMENSIONS: Record<Format, { width: number; height: number }> = {
-  "16:9": { width: 1920, height: 1080 },
-  "9:16": { width: 1080, height: 1920 },
-  "1:1": { width: 1080, height: 1080 },
-  "4:5": { width: 1080, height: 1350 },
-};
+export async function renderVideo(
+  input: RenderInput
+): Promise<{ outputPath: string; durationActual: number }> {
+  const { projectDir, outputMp4Path, fps = 30, quality = "standard" } = input;
 
-export async function renderVideo(input: RenderInput): Promise<{ outputPath: string; durationActual: number }> {
-  const { htmlPath, outputMp4Path, format, durationSeconds, fps = 30 } = input;
-  const dims = DIMENSIONS[format];
+  if (!existsSync(projectDir)) {
+    throw new Error(`Project directory does not exist: ${projectDir}`);
+  }
+
+  const args = [
+    "hyperframes",
+    "render",
+    projectDir,
+    "--output",
+    outputMp4Path,
+    "--fps",
+    String(fps),
+    "--quality",
+    quality,
+  ];
+
+  if (input.variables) {
+    args.push("--variables", JSON.stringify(input.variables));
+  }
+  if (input.strict) {
+    args.push("--strict");
+  }
 
   return new Promise((resolve, reject) => {
-    const args = [
-      "hyperframes",
-      "render",
-      htmlPath,
-      "--output",
-      outputMp4Path,
-      "--width",
-      String(dims.width),
-      "--height",
-      String(dims.height),
-      "--duration",
-      String(durationSeconds),
-      "--fps",
-      String(fps),
-    ];
-
+    const startedAt = Date.now();
     const child = spawn("npx", args, { stdio: "inherit" });
 
     child.on("error", (err) => {
-      reject(new Error(`hyperframes render failed: ${err.message}\n` + getInstallHelp()));
+      reject(new Error(`hyperframes render failed: ${err.message}`));
     });
     child.on("exit", (code) => {
-      if (code === 0) resolve({ outputPath: outputMp4Path, durationActual: durationSeconds });
-      else reject(new Error(`hyperframes render exited with code ${code}\n` + getInstallHelp()));
+      if (code === 0) {
+        const durationActual = (Date.now() - startedAt) / 1000;
+        resolve({ outputPath: outputMp4Path, durationActual });
+      } else {
+        reject(new Error(`hyperframes render exited with code ${code}`));
+      }
     });
   });
 }
 
-function getInstallHelp(): string {
-  return [
-    "Install hyperframes:",
-    "  cd <project-root>",
-    "  npm install hyperframes",
-    "  npx hyperframes init",
-    "Then re-run.",
-  ].join("\n");
+// ----------------------------------------------------------------
+//  Optional: lint before render to catch issues early
+// ----------------------------------------------------------------
+
+export async function lintProject(projectDir: string): Promise<{ passed: boolean; output: string }> {
+  return new Promise((resolve) => {
+    let output = "";
+    const child = spawn("npx", ["hyperframes", "lint", projectDir], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk) => { output += chunk.toString(); });
+    child.stderr.on("data", (chunk) => { output += chunk.toString(); });
+    child.on("exit", (code) => {
+      resolve({ passed: code === 0, output });
+    });
+    child.on("error", (err) => {
+      resolve({ passed: false, output: `lint spawn error: ${err.message}` });
+    });
+  });
 }

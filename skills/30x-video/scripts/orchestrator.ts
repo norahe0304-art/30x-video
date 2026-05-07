@@ -35,7 +35,7 @@ import { renderPlan, lockPlan } from "./confirmation-gate.ts";
 import { generateScriptHeuristic } from "./script-generator.ts";
 import { synthesizeVoiceOver } from "./vo-synth.ts";
 import { fetchBgm, shouldFetchBgm } from "./bgm-fetch.ts";
-import { composeHtml } from "./compose.ts";
+import { buildHyperframesProject } from "./compose.ts";
 import { renderVideo } from "./render.ts";
 import type {
   ConfirmedPlan,
@@ -132,25 +132,23 @@ export async function executePhase(opts: ExecuteOptions): Promise<DeliveryManife
       : Promise.resolve(undefined),
   ]);
 
-  // [6] Composer
-  const htmlPath = join(outputDir, "composition.html");
-  const html = composeHtml({
+  // [6] Composer — build a Hyperframes project directory
+  const projectDir = join(outputDir, "hyperframes-project");
+  buildHyperframesProject({
     script,
     designProfile: plan.designProfile,
     composition: plan.composition,
     voAsset,
     bgmAsset,
-    outputHtmlPath: htmlPath,
+    projectDir,
+    projectName: jobId,
   });
-  writeFileSync(htmlPath, html);
 
-  // [7] Render
+  // [7] Render — invoke Hyperframes CLI on the project directory
   const videoPath = join(outputDir, "video.mp4");
   await renderVideo({
-    htmlPath,
+    projectDir,
     outputMp4Path: videoPath,
-    format: plan.composition.format,
-    durationSeconds: plan.composition.durationSeconds,
   });
 
   // [8] Finish Gate — STUB for now (would invoke critique-scenes.ts +
