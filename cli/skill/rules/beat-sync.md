@@ -31,7 +31,7 @@ The analyzer writes an explicit verdict — `rhythmic: true|false` — plus its 
 
 - Every scene transition start frame = `round(beats_sec[i] * fps)` for some real beat `i`. Prefer `downbeats_sec` for act boundaries (the big cuts land on bar lines, minor vignette cuts may take any beat).
 - The first cut is never before `beats_sec[0]` — tracks often fade in; a cut in the pre-beat limbo feels early.
-- Beat pulses / accent animations read the same grid. `src/generated/beat-map.ts` (the orchestrator's legacy pulse constants) stays as the mechanical carrier for MainVideo's pulse, but audiomap is the truth: if `beatMap.bpm` differs from `audiomap.bpm` by more than 2%, rewrite the beat-map constants from audiomap values (`bpm`, `firstBeatSec = beats_sec[0]`) — never the other way around.
+- **The grid times CUTS, never a visible pulse.** Continuous downbeat scale/brightness throb on the frame (`1 + beatHit * k`) is BANNED — user verdict 2026-07-04: "心跳的那种动效 以后别用" (see taste.md heartbeat ban). Delete the orchestrator's legacy MainVideo pulse wrapper on sight; `src/generated/beat-map.ts` survives only as the cut-timing carrier. If `beatMap.bpm` differs from `audiomap.bpm` by more than 2%, rewrite the beat-map constants from audiomap values (`bpm`, `firstBeatSec = beats_sec[0]`) — never the other way around.
 
 ### `rhythmic: false` → breathe with energy and silence
 

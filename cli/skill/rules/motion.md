@@ -12,7 +12,7 @@ The AE-expression motion vocabulary lives in a sibling skill: **`~/.claude/skill
 | Inertia / overshoot bounce (`spring damping 9` or decaying-sine settle) | arrive with weight, then settle | The ONE hero element arrival per act (logo, key number, main panel). Never on every element — overshoot everywhere = cartoon. Siblings keep damping 14-16 |
 | Idle float / breathe (`sin` bob ±1-2% scale) | alive while holding | Directly serves the "never hold still >4s" rule — logos in Act 1/5, hero numbers in Act 4, phones/mockups mid-hold |
 | Stagger / delay-follow (`frame - i*3`; grid: `(i%COLS)*2 + row*5`) | crowd trailing a leader | Grids and lists entering — the diagonal-wave grid variant beats uniform left-to-right stagger |
-| `loopOut` cycle / pingpong | seamless idle loops | Background particles, scanning lines, pulse accents that must run the whole act without a visible seam |
+| `loopOut` cycle / pingpong | seamless idle loops | Background particles, scanning lines, positional drift loops that must run the whole act without a visible seam (rhythmic scale/brightness throb = heartbeat ban, taste.md) |
 | 2D `lookAt` (atan2 to target) | element faces its motion path | Anything traveling along a path — arrows, vehicles, data packets in a convergence scene (composition.md hub-and-spoke replacement) |
 | Exponential approach (half-life ease) | camera easing to rest, no bounce | Ken-Burns endings, camera reframes inside a brand world, follow-cam on a moving subject |
 
@@ -90,7 +90,7 @@ const scale = interpolate(frame, [0, 20], [0, 1], {
 - **Exit:** 10-15 frames (opacity fade only, ~75% of entrance duration)
 - **Stagger:** 4-8 frames between siblings. Cap total: 10 items × 4f = 40f max
 - **First 3 seconds:** must animate immediately — no slow fade from black
-- **Static limit:** never hold still >4 seconds — add glow pulse, float drift, cursor
+- **Static limit:** never hold still >4 seconds — add float drift, cursor motion, or a slow glow *position* shift (never rhythmic glow/scale throb — heartbeat ban, taste.md)
 
 ## IRON LAW: Animation Must Complete Before Scene Ends
 

@@ -1,5 +1,5 @@
 ---
-name: 30x-web-to-video
+name: remotion-beautiful-videos
 description: Use when a user gives a brand URL and wants a premium launch, demo, or marketing video. Zero-manual workflow — Claude runs the V2 orchestrator itself (scrapes brand evidence, auto-installs missing tools, generates the first-cut Remotion project). User only sees the URL and the Studio preview.
 ---
 

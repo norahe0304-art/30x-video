@@ -434,7 +434,7 @@ const Act2Reveal: React.FC = () => {
 //   其它                               → KanbanBoard → DataTable → AnalyticsDashboard
 //
 // feature 文案做左上角 eyebrow + 大字 headline + accent 渐变下划线.
-// UI mockup 做主视觉, beatHit 时做整体微呼吸.
+// UI mockup 做主视觉 (禁 beatHit 呼吸 — heartbeat ban).
 // 只有在 feature 数量 < 1 时才 fallback 成 EditorialVignette.
 // ================================================================
 
@@ -1188,14 +1188,8 @@ export const MainVideo: React.FC = () => {
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
-  // Downbeat pulse — 每小节一次, 约 2s, 不是 strobe
-  const relFrame = frame - FIRST_BEAT;
-  const measureIdx = Math.floor(relFrame / MEASURE_FRAMES);
-  const phase = relFrame - measureIdx * MEASURE_FRAMES;
-  const isPreRoll = relFrame < 0;
-  const beatHit = isPreRoll ? 0 : Math.exp(-phase / 5);
-  const beatScale = 1 + beatHit * 0.006;
-  const beatBright = 1 + beatHit * 0.04;
+  // 心跳式 downbeat 脉冲已封杀 (taste.md heartbeat ban, Nora 2026-07-04):
+  // 节律性 scale/brightness 抖动 = 心跳感. beat grid 只用于剪辑点, 不做可见脉冲.
 
   // Scene durations from constitution (seconds → frames)
   const authorityFrames = getActFrames("authority", 150);
@@ -1211,8 +1205,7 @@ export const MainVideo: React.FC = () => {
         color: theme.color.text,
         fontFamily: theme.font.body,
         overflow: "hidden",
-        filter: `url(#color-grade) brightness(${beatBright})`,
-        transform: `scale(${beatScale})`,
+        filter: "url(#color-grade)",
       }}
     >
       {BGM_SRC ? <Audio src={BGM_SRC} volume={bgmVolume} /> : null}

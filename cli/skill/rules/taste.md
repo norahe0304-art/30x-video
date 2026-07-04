@@ -32,6 +32,10 @@ These patterns instantly signal "AI-generated." Never use:
 - Template layouts that survive a logo swap
 - Bad contrast hidden behind blur, glow, or tinted overlays
 - **Expanding ring / ripple / burst-circle motion** (impact rings, sonar ripples, city-dot ripples — any stroked circle animating its radius outward). User verdict 2026-07-04: "我最恶心这种圆形的动效". Express impact with a glow-intensity pulse, a scale pop on the object itself, or a power-cut flicker — never a detached expanding circle
+- **Heartbeat motion — any rhythmic scale/brightness oscillation** (downbeat scale pulse on the whole frame, `1 + Math.sin(frame/N) * k` breathing on glows/blobs/backgrounds, BGM-synced throb). User verdict 2026-07-04: "心跳的那种动效 以后别用". The throb reads as anxious, not alive. Slow positional drift (`translateX/Y` sine float) is still fine — atmosphere moves, it never *pumps*. Beat-sync stays for CUT TIMING only (transitions/act boundaries on downbeats), never as a continuous visual pulse
+- **Decorative horizontal bars / rules / divider lines** — animated accent bars under headlines, metric progress-bar tracks, `borderBottom` hairlines between rows, vertical divider strokes between logo/stat groups. User verdict 2026-07-04: "我不喜欢那些横杠杠". Group with spacing and weight hierarchy instead; a real number (9/10) says more than a filled track
+- **Symbol/dingbat decoration rows** — star-rating glyphs, sparkles, diamonds, any repeated icon strip used as ornament. User verdict 2026-07-04: "symbols之类的 (不要)". Ratings become numeric text; grouping becomes whitespace
+- **Text overlaid on a full-bleed motion asset** — when a real motion graphic (product film, app showcase video) plays full-screen, it IS the statement; no headline on top. User verdict 2026-07-04: "动效图上面就不要字了 因为那个是全屏". Either full-bleed textless, or contained in a panel with type outside — never both at once
 - Two adjacent beats sharing the same visual formula (e.g. "map + arcs" twice in a row) — each beat gets its own world; see composition diversity in composition.md
 
 **The test:** Show this video and say "AI made this." Would they believe immediately? If yes, redesign.
