@@ -1,5 +1,5 @@
 # references/
-> L2 | 父级: [/Users/nora/Desktop/Hackthon/remotion-video-skill/AGENTS.md](/Users/nora/Desktop/Hackthon/remotion-video-skill/AGENTS.md)
+> L2 | 父级: [../AGENTS.md](../AGENTS.md)
 
 成员清单
 animations.md: 文本、路径、进入退出等动画配方与代码片段，给场景实现提供可复用动作语汇。

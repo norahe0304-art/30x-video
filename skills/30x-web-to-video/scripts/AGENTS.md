@@ -1,5 +1,5 @@
 # scripts/
-> L2 | 父级: [/Users/nora/Desktop/Hackthon/remotion-video-skill/AGENTS.md](/Users/nora/Desktop/Hackthon/remotion-video-skill/AGENTS.md)
+> L2 | 父级: [../AGENTS.md](../AGENTS.md)
 
 成员清单
 beat-sync.ts: BGM 节拍检测与默认切点建议，输出 `beat-map.json`，给 TransitionSeries 对齐节奏。

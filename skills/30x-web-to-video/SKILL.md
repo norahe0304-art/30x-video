@@ -171,7 +171,7 @@ Four evidence-based QC gates run inside this workflow — Asset Audit (Step 2.5)
 **CLAUDE runs this, not the user.** When a user gives you a brand URL, immediately invoke the orchestrator via the Bash tool. Do NOT paste the command and ask the user to run it. Do NOT manually scaffold. Do NOT manually scrape. The orchestrator handles preflight (tool install), scaffold copying, brand harvesting, evidence scoring, mode selection, scene constitution, theme generation, beat-sync, and visual-audit — all in one command.
 
 ```bash
-npx tsx /Users/nora/.claude/skills/remotion-video/scripts/url-to-video.ts <brand-url> --out ./<brand-name>-launch-video --yes
+npx tsx <installed-skill-dir>/scripts/url-to-video.ts <brand-url> --out ./<brand-name>-launch-video --yes
 ```
 
 - `<brand-url>`: the actual URL (e.g. `https://stripe.com`)
