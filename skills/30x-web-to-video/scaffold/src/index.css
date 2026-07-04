@@ -1,0 +1,18 @@
+/* ================================================================
+ * 全局样式 — 字体由 theme.ts + @remotion/google-fonts 控制
+ * 此文件仅负责 Tailwind 导入与基础 reset
+ * ================================================================ */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body, div, span, p, h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono) !important;
+}

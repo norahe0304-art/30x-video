@@ -1,0 +1,9 @@
+node_modules/
+dist/
+out/
+.DS_Store
+*.mp4
+*.mov
+scaffold/node_modules/
+scaffold/build/
+benchmarks/runs/

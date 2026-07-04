@@ -1,0 +1,55 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "version": "1.0.0",
+  "description": "Premium product launch video \u2014 Remotion",
+  "repository": {},
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.484",
+    "@remotion/google-fonts": "4.0.484",
+    "@remotion/light-leaks": "4.0.484",
+    "@remotion/media": "4.0.484",
+    "@remotion/noise": "4.0.484",
+    "@remotion/paths": "4.0.484",
+    "@remotion/tailwind-v4": "4.0.484",
+    "@remotion/transitions": "4.0.484",
+    "clsx": "^2.1.1",
+    "dotted-map": "^3.1.0",
+    "lucide-react": "^0.577.0",
+    "simple-icons": "^16.24.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.484",
+    "tailwind-merge": "^3.5.0",
+    "zod": "4.3.6",
+    "@remotion/lottie": "4.0.484",
+    "lottie-web": "^5.12.2",
+    "@remotion/motion-blur": "4.0.484",
+    "@remotion/effects": "4.0.484",
+    "three": "^0.182.0",
+    "@remotion/three": "4.0.484"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.484",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "autoprefixer": "^10.4.27",
+    "eslint": "9.19.0",
+    "postcss": "^8.5.8",
+    "prettier": "3.8.1",
+    "tailwindcss": "^4.2.1",
+    "typescript": "5.9.3",
+    "@types/three": "^0.182.0"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "render": "remotion render --codec h264 --crf 16 --color-space bt709 --image-format png --gl=angle",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}
