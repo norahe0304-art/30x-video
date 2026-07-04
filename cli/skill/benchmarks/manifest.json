@@ -1,0 +1,164 @@
+{
+  "suite": {
+    "name": "url-to-video-v2-benchmark-suite",
+    "version": "0.2.0",
+    "status": "runner-backed",
+    "purpose": "Canonical offline benchmark set for URL-to-video V2 first-cut generation.",
+    "scope": "Framework-agnostic; the orchestrator can turn each URL into a Remotion-ready benchmark run."
+  },
+  "output_contract": {
+    "required_outputs": [
+      "evidence_score",
+      "chosen_mode",
+      "archetype",
+      "first_cut",
+      "self_review",
+      "human_evaluation"
+    ],
+    "field_notes": {
+      "evidence_score": "Overall score plus sub-scores and rationale.",
+      "chosen_mode": "product-evidence, editorial, or blocked.",
+      "archetype": "Primary archetype and optional secondary archetype.",
+      "first_cut": "Initial artifact path or render identifier for the first edit pass.",
+      "self_review": "Gate results from evidence, taste, and edit checks.",
+      "human_evaluation": "Reviewer score and short notes on whether the first cut is worth polishing."
+    }
+  },
+  "benchmarks": [
+    {
+      "id": "vercel-b2b-infra",
+      "brand": "Vercel",
+      "category": "b2b-infra",
+      "url": "https://vercel.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Enterprise infra benchmark with strong product UI, documentation density, and restrained motion."
+    },
+    {
+      "id": "supabase-b2b-infra",
+      "brand": "Supabase",
+      "category": "b2b-infra",
+      "url": "https://supabase.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Developer platform benchmark with dashboard-heavy pages and strong technical positioning."
+    },
+    {
+      "id": "stripe-fintech",
+      "brand": "Stripe",
+      "category": "fintech",
+      "url": "https://stripe.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Payments and fintech benchmark with premium enterprise trust signals and strong visual systems."
+    },
+    {
+      "id": "wise-fintech",
+      "brand": "Wise",
+      "category": "fintech",
+      "url": "https://wise.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Consumer-fintech crossover benchmark with conversion-oriented product pages and pricing clarity."
+    },
+    {
+      "id": "openai-ai-product",
+      "brand": "OpenAI",
+      "category": "ai-product",
+      "url": "https://openai.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "mixed-ui-and-brand",
+      "notes": "AI product benchmark with a blend of product proof, brand storytelling, and high-recognition assets."
+    },
+    {
+      "id": "anthropic-ai-product",
+      "brand": "Anthropic",
+      "category": "ai-product",
+      "url": "https://anthropic.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "brand-led-with-ui",
+      "notes": "AI product benchmark for trust, clarity, and careful editorial motion around product evidence."
+    },
+    {
+      "id": "linear-design-productivity",
+      "brand": "Linear",
+      "category": "design-productivity",
+      "url": "https://linear.app",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "High-taste productivity benchmark with sharp interface hierarchy and disciplined motion."
+    },
+    {
+      "id": "notion-design-productivity",
+      "brand": "Notion",
+      "category": "design-productivity",
+      "url": "https://www.notion.so",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Productivity benchmark with flexible UI surfaces, dense content, and hybrid editorial/product framing."
+    },
+    {
+      "id": "apple-consumer-brand",
+      "brand": "Apple",
+      "category": "consumer-brand",
+      "url": "https://www.apple.com",
+      "mode_hint": "editorial",
+      "evidence_profile": "brand-led",
+      "notes": "Consumer brand benchmark with large-format storytelling, product heroism, and polished compositional rhythm."
+    },
+    {
+      "id": "nike-consumer-brand",
+      "brand": "Nike",
+      "category": "consumer-brand",
+      "url": "https://www.nike.com",
+      "mode_hint": "editorial",
+      "evidence_profile": "brand-led",
+      "notes": "Consumer brand benchmark with cultural momentum, motion energy, and strong visual language."
+    },
+    {
+      "id": "aesop-luxury-editorial",
+      "brand": "Aesop",
+      "category": "luxury-editorial",
+      "url": "https://www.aesop.com",
+      "mode_hint": "editorial",
+      "evidence_profile": "editorial-heavy",
+      "notes": "Luxury editorial benchmark with restrained copy, tactile imagery, and refined pacing."
+    },
+    {
+      "id": "hermes-luxury-editorial",
+      "brand": "Hermes",
+      "category": "luxury-editorial",
+      "url": "https://www.hermes.com",
+      "mode_hint": "editorial",
+      "evidence_profile": "editorial-heavy",
+      "notes": "Luxury editorial benchmark with a heritage-led tone and premium visual spacing."
+    },
+    {
+      "id": "redbull-no-ui-brand",
+      "brand": "Red Bull",
+      "category": "no-ui-brand",
+      "url": "https://www.redbull.com",
+      "mode_hint": "editorial",
+      "evidence_profile": "brand-led",
+      "notes": "No-UI brand benchmark with editorial, motion, and culture-led signals rather than product UI."
+    },
+    {
+      "id": "figma-heavy-ui-brand",
+      "brand": "Figma",
+      "category": "heavy-ui-brand",
+      "url": "https://www.figma.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Heavy UI benchmark with rich product surfaces, collaboration cues, and component-driven storytelling."
+    },
+    {
+      "id": "canva-heavy-ui-brand",
+      "brand": "Canva",
+      "category": "heavy-ui-brand",
+      "url": "https://www.canva.com",
+      "mode_hint": "product-evidence",
+      "evidence_profile": "ui-rich",
+      "notes": "Heavy UI benchmark with broad feature surface area, template density, and broad audience appeal."
+    }
+  ]
+}

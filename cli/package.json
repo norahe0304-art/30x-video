@@ -1,0 +1,15 @@
+{
+  "name": "30x-web-to-video",
+  "version": "1.0.0",
+  "description": "One URL in, an agency-grade brand launch video out. Harvests the site, scaffolds a Remotion project, and hands Claude Code a battle-tested taste codex (10-brand validated) to design the five acts.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Nora He",
+  "repository": { "type": "git", "url": "https://github.com/norahe0304-art/30x-video" },
+  "homepage": "https://github.com/norahe0304-art/30x-video#readme",
+  "keywords": ["remotion", "video", "claude-code", "skill", "marketing", "launch-video", "agent"],
+  "bin": { "30x-web-to-video": "cli.mjs" },
+  "files": ["cli.mjs", "skill/", "README.md"],
+  "engines": { "node": ">=20" },
+  "dependencies": { "tsx": "^4.7.0" }
+}
