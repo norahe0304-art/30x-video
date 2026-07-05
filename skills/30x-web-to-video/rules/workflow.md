@@ -240,6 +240,8 @@ sed 's|//.*||' src/MainVideo.tsx | grep -qE 'staticFile\("brand/homepage|findAss
 
 ### Visual Classification — demo / cover (MANDATORY — BLOCKING)
 
+**Spoken-watermark check (BLOCKING, Laper incident 2026-07-05).** Free-library tracks routinely carry spoken tags ("royalty free music", channel names) baked into the audio. Before accepting any downloaded BGM: extract three 8-10s windows (head / peak / tail) with ffmpeg and inspect for speech — e.g. `ffmpeg -ss <t> -t 8 -i bgm.mp3 -af silencedetect=n=-30dB -f null -` plus an actual listen-equivalent (whisper-tiny transcription of the windows works: any transcribed words = reject the track). A track that fails goes back to the pool; never ship a watermark to the user's ears.
+
 **Dedup is necessary but not sufficient.** Even with unique images, pairing the wrong *kind* of image with the wrong *kind* of copy destroys trust. A Raycast og-image with "Your shortcut to everything" baked into the pixels must not have another scraped headline overlaid on it — that is the content-mismatch bug the user called out as *"素材非常的不 make sense"*.
 
 **Before composing any scene, classify every harvested visual into exactly one bucket:**
