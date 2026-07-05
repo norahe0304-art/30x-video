@@ -61,7 +61,12 @@
     Six of them were built by autonomous agents reading only the rules.
   </div>
   <div class="cmdrow">
-    <code class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">npx 30x-web-to-video &lt;your-brand-url&gt; --agent</code>
+    <code class="cmd" title="install once, use everywhere" onclick="navigator.clipboard.writeText('npx 30x-web-to-video --global')">npx 30x-web-to-video --global</code>
+    <span style="font-size:13px;color:var(--dim)">install once · then just tell Claude Code: "make a launch video for your-brand.com"</span>
+  </div>
+  <div class="cmdrow" style="margin-top:14px">
+    <code class="cmd" onclick="navigator.clipboard.writeText('npx 30x-web-to-video <your-brand-url> --agent')">npx 30x-web-to-video &lt;url&gt; --agent</code>
+    <span style="font-size:13px;color:var(--dim)">or: one-shot — harvest &amp; build right now</span>
     <a class="gh" href="https://github.com/norahe0304-art/30x-video" target="_blank">GitHub ↗</a>
     <a class="gh" href="https://www.npmjs.com/package/30x-web-to-video" target="_blank">npm ↗</a>
   </div>
