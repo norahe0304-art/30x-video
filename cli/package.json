@@ -1,6 +1,6 @@
 {
   "name": "30x-web-to-video",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "One URL in, an agency-grade brand launch video out. Harvests the site, scaffolds a Remotion project, and hands Claude Code a battle-tested taste codex (10-brand validated) to design the five acts.",
   "type": "module",
   "license": "MIT",
