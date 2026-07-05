@@ -1,94 +1,95 @@
-# 30x-video
+# 30x web-to-video
 
-> Tell it what you want, get a video.
+> One URL in. An agency-grade launch video out.
 
-A Claude Code / Codex skill that generates agency-grade marketing videos with
-auto-composed background music and voice over — driven by a curated library
-of real reference videos and on-brand design profiles.
+**[▶ Watch all 14 films](https://norahe0304-art.github.io/30x-video/)** · [npm](https://www.npmjs.com/package/30x-web-to-video)
 
-## Three-line philosophy
+A Claude Code skill that turns any brand's website into a 40-second launch video —
+real brand assets, a 5-act narrative, word-aligned AI voiceover, beat-synced music,
+and a **taste codex of 16 hard-won design laws** that keeps every film premium and
+every brand distinct.
 
-```
-Refero       is our design library    — taste comes from real screens
-Hyperframes  is our engine            — HTML+GSAP, Apache 2.0, no build
-Our pipeline is our soul              — the moat lives here
-```
+14 brands tested. 14 completely different visual worlds. Zero templates.
+Six of the films were built end-to-end by autonomous agents reading nothing but the rules.
 
-We don't sell a tool. We sell the ability for every user to be proud of
-their video.
+## Quick start
 
-## How to use
+```bash
+# one-shot: harvest a brand and build the video
+npx 30x-web-to-video https://your-brand.com --agent
 
-```
-Use 30x-video. Make a [duration] [format] video about [topic].
-```
-
-Examples:
-
-```
-Use 30x-video. Make a 15s vertical video about morning routines.
-Use 30x-video. Make a 30s ad for Stripe's new fraud detection feature.
-Use 30x-video. Make a video for this coffee cup with a warm minimalist vibe.
+# or: install the skill user-wide, then just talk to Claude Code
+npx 30x-web-to-video --global
+# → open Claude Code anywhere and say: "make a launch video for your-brand.com"
 ```
 
-That's it. You describe what you want. The agent reads your brief, lays out
-a complete plan (format / pacing / VO / BGM / visual style), asks any
-ambiguous questions in one batch, and waits for your `go` before rendering.
-No guessing. No half-baked output.
+Requirements: **Node 20+** and **[Claude Code](https://claude.com/claude-code)**.
+Everything else (ffmpeg, yt-dlp, playwright) auto-installs during harvest.
+An `ELEVENLABS_API_KEY` in the project `.env` gets you premium narration;
+without one it falls back to local TTS — zero keys needed.
 
-## Three gates
-
-| Gate | When | What |
-|------|------|------|
-| **Confirmation Gate** | Before any rendering | Lock all decisions, align with user, zero rework |
-| **Taste Discipline** | Throughout pipeline | Anti-slop blacklist enforced as hard constraint |
-| **Finish Gate** | Before final delivery | Auto-critique + up to 2 iterations |
-
-## Architecture
+## How it works
 
 ```
-brief
-  → Content Analyzer
-  → Style Hunter (Refero search → VoltAgent DESIGN.md → creator preset fallback)
-  → 5-dim Style Composer (visual / pacing / bgm / vo / format)
-  → 🚪 Confirmation Gate
-  → Script Generator
-  → Asset Producer (VO synth + BGM fetch + visuals)
-  → Composer (Hyperframes HTML + GSAP)
-  → Render (Puppeteer + FFmpeg)
-  → Finish Gate (LLM critique + iterate)
-  → video.mp4
+┌──────────────┐   ┌──────────────────┐   ┌──────────────────────────┐
+│   HARVEST    │ → │   TASTE CODEX    │ → │   FIVE-ACT FILM          │
+│ deterministic│   │ 16 design laws   │   │ Remotion + React         │
+│ colors fonts │   │ 4 evidence gates │   │ ElevenLabs word-aligned  │
+│ copy logo UI │   │ Claim→World map  │   │ VO · beat-synced BGM     │
+└──────────────┘   └──────────────────┘   └──────────────────────────┘
 ```
 
-## Tech stack
+1. **Harvest** — a deterministic orchestrator scrapes the real brand: computed colors,
+   loaded fonts, verbatim copy, logo, product screenshots, official demo video, BGM candidates.
+2. **Taste** — Claude designs five acts under the codex: no expanding rings, no heartbeat
+   pulses, no divider bars, no text over full-bleed motion, one world per film, real assets
+   over drawn abstractions. Every rule cites the incident that created it.
+3. **Evidence gates** — every asset is audited frame-by-frame before use; every act renders
+   proof frames that get inspected; cuts snap to voiceover phrase onsets measured from
+   word-level timestamps; downloaded music is whisper-checked for spoken watermarks.
 
-| Layer | Choice |
-|-------|--------|
-| Render engine | [hyperframes](https://github.com/heygen-com/hyperframes) (Apache 2.0) |
-| Design library | [Refero MCP](https://refero.design/mcp) |
-| DESIGN.md source | [VoltAgent awesome-design-md](https://github.com/voltagent/awesome-design-md) via `npx getdesign` |
-| TTS / VO | Kokoro via hyperframes-media (single provider) |
-| BGM | Royalty-free pool + yt-dlp + aubiotrack BPM detection |
-| Beat sync | aubiotrack |
-| Critique | LLM (Claude / GPT) |
+## What's in the box
 
-## Reference library
+```
+skills/30x-web-to-video/
+├── SKILL.md                  # the workflow: 8 steps, 4 blocking gates
+├── rules/                    # the taste codex — 16 laws with case law
+│   ├── taste.md              #   anti-slop blacklist (rings, pulses, bars, pills…)
+│   ├── composition.md        #   zero-vacuum, full-bleed moments, unity of world
+│   ├── narration-sync.md     #   continuous VO, cuts snap to phrase onsets
+│   ├── artifact-catalog.md   #   selection priority: semantics > real assets > rotation
+│   └── …
+├── scaffold/                 # Remotion project template (transitions, shaders, captions)
+└── scripts/                  # orchestrator, beat-sync, audiomap, visual-audit
+```
 
-Instead of writing 1800 lines of abstract design rules, we curate **real
-videos** as references. The `references/video-library/` notebook contains
-50 hand-picked YouTube videos tagged across 5 dimensions, organized in
-three quality tiers:
+## The showcase
 
-- **S — Gold standard** (20): Apple / Aesop / Patagonia / Stripe / Linear / etc.
-- **A — Data + reputation** (20): 100k+ likes AND 1M+ views, 1-3 min, Cannes-grade
-- **B — Creator viral** (10): top creator hooks, 5M+ views
+| # | Brand | World |
+|---|-------|-------|
+| 01 | Happy Model — AI gateway | black/green routing world, global backbone |
+| 02 | Caylent — AWS consulting | black/mint infra, sailboat footage, agent decision graph |
+| 03 | Perplexity PC | cream editorial, official 3D assets |
+| 04 | Parker — AI banking | retro serif collage, 1940s jazz *(agent-built)* |
+| 05 | Maná — yerba mate | four flavor-colored rooms *(agent-built)* |
+| 06 | Cofounder — AI agent | pixel-pastoral; saw through a wrapper site *(agent-built)* |
+| 07 | JetPartners — private aviation | navy old-money, night aerials |
+| 08 | biuty — beauty AI | lavender, real face-scan footage |
+| 09 | daydream — AI SEO | warm paper, hand-drawn wordmark *(agent-built)* |
+| 10 | Corgi — startup insurance | painted skies, official mascot family *(agent-built)* |
+| 11 | Orchid — iMessage assistant | paper-to-dusk, petals converge into the mark *(agent-built)* |
+| 12 | TheraSun — spectral window film | warm-black amber, the spectrum splits |
+| 13 | Idensia — brand passport | deep-forest engraving world |
+| 14 | Laper — screenwriting software | screenplay paper, FADE IN:, film-noir jazz |
 
-Real examples beat abstract rules — the same philosophy Refero applies to
-design.
+**[▶ Watch them all](https://norahe0304-art.github.io/30x-video/)**
 
-## Status
+## Philosophy
 
-🚧 Active development.
+AI-generated video all looks the same because everyone writes "make it premium" in a prompt.
+Premium is not an adjective. Premium is a few hundred specific *nevers* — written down,
+enforced by evidence, and versioned. Every time this codex grows, the floor rises for
+everyone who runs it.
 
 ## License
 

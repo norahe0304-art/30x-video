@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30x web-to-video — One URL in, an agency-grade launch video out</title>
+<meta name="description" content="14 brands, 14 visual worlds, zero templates. A Claude Code skill that turns any brand URL into an agency-grade launch video.">
+<meta property="og:title" content="30x web-to-video — 14 brands, 14 worlds, zero templates">
+<meta property="og:description" content="One npx command turns any brand URL into an agency-grade launch video. Taste encoded as code.">
+<meta property="og:image" content="https://norahe0304-art.github.io/30x-video/posters/05-mana.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg: #0B0B0E; --ink: #F4F2ED; --muted: rgba(244,242,237,0.55); --dim: rgba(244,242,237,0.32); --green: #9BE8C8; }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(ellipse 90% 55% at 50% -10%, rgba(120,110,255,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 85% 100%, rgba(220,98,147,0.06) 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(48px, 9vh, 110px) clamp(20px, 5vw, 110px) 120px;
+  }
+  header { max-width: 1440px; margin: 0 auto clamp(60px, 9vh, 110px); }
+  .eyebrow { font-family: "SF Mono", Menlo, monospace; font-size: clamp(11px, 1.2vw, 13px); letter-spacing: 5px; color: var(--dim); text-transform: uppercase; margin-bottom: 26px; }
+  h1 { font-weight: 650; font-size: clamp(38px, 6.8vw, 108px); line-height: 1.04; letter-spacing: -0.035em; }
+  h1 .soft { color: var(--muted); font-weight: 300; }
+  .sub { margin-top: 30px; font-size: clamp(15px, 1.6vw, 19px); font-weight: 300; color: var(--muted); line-height: 1.75; max-width: 780px; }
+  .cmdrow { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .cmd {
+    font-family: "SF Mono", Menlo, monospace; font-size: clamp(12px, 1.4vw, 15px); color: var(--green);
+    background: rgba(155,232,200,0.07); border: 1px solid rgba(155,232,200,0.14);
+    padding: 13px 22px; border-radius: 12px; cursor: pointer; user-select: all; transition: background .2s;
+  }
+  .cmd:hover { background: rgba(155,232,200,0.13); }
+  .gh { font-size: 14px; color: var(--muted); text-decoration: none; border-bottom: 1px solid rgba(244,242,237,0.2); padding-bottom: 2px; }
+  .gh:hover { color: var(--ink); }
+  .grid { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(430px, 100%), 1fr)); gap: clamp(40px, 5vw, 64px) 44px; }
+  .card video { width: 100%; aspect-ratio: 16/9; border-radius: 16px; display: block; background: #000; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+  .meta { padding: 20px 4px 0; }
+  .idx { font-family: "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: 4px; color: var(--dim); }
+  .name { margin-top: 8px; font-size: clamp(22px, 2.4vw, 28px); font-weight: 650; letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .name .cat { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .world { margin-top: 7px; font-size: 14.5px; font-weight: 300; color: var(--muted); line-height: 1.6; }
+  footer { max-width: 1440px; margin: 110px auto 0; }
+  .foot-cta { font-size: clamp(22px, 3.4vw, 44px); font-weight: 650; letter-spacing: -0.02em; line-height: 1.2; }
+  .foot-cta .soft { color: var(--muted); font-weight: 300; }
+  .foot-mono { margin-top: 34px; font-family: "SF Mono", Menlo, monospace; font-size: 12px; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">30x · Web to Video · Claude Code Skill</div>
+  <h1>One URL in.<br><span class="soft">An agency-grade launch video out.</span></h1>
+  <div class="sub">
+    14 brands, 14 visual worlds, zero templates. Every film below was generated from nothing but the brand's own website —
+    real assets, real copy, a 5-act narrative, word-aligned voiceover, and a taste codex of 16 hard-won design laws.
+    Six of them were built by autonomous agents reading only the rules.
+  </div>
+  <div class="cmdrow">
+    <code class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">npx 30x-web-to-video &lt;your-brand-url&gt; --agent</code>
+    <a class="gh" href="https://github.com/norahe0304-art/30x-video" target="_blank">GitHub ↗</a>
+    <a class="gh" href="https://www.npmjs.com/package/30x-web-to-video" target="_blank">npm ↗</a>
+  </div>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  <div class="foot-cta">Taste is not an adjective.<br><span class="soft">It's a few hundred "nevers", written as code.</span></div>
+  <div class="foot-mono">npx 30x-web-to-video --global · MIT · built with Claude Code</div>
+</footer>
+
+<script>
+const FILMS = [
+  ["01-happy-model","Happy Model","AI Gateway","Black-and-green routing world — a global backbone lights up hop by hop; one key, every model."],
+  ["02-caylent","Caylent","AWS Consulting","Black-and-mint infra world — real sailboat footage, geometric logo growth, an agent decision graph."],
+  ["03-perplexity-pc","Perplexity PC","Personal Computer","Cream editorial world — official 3D assets as the hero, harvested by a real browser after a 403."],
+  ["04-parker","Parker","AI Banking","Retro serif collage with 1940s jazz — built autonomously by an agent reading only the rules."],
+  ["05-mana","Maná","Yerba Mate","Four flavor-colored rooms — the site's own Neue Montreal type, a nutrition panel as typography."],
+  ["06-cofounder","Cofounder","AI Agent","Pixel-pastoral world — the agent saw through a mobbin wrapper and harvested the real site."],
+  ["07-jetpartners","JetPartners","Private Aviation","Navy old-money world — night-city aerials, serif lockups, not a single loud frame."],
+  ["08-biuty","biuty","Beauty AI","Lavender world — real face-scan footage, giant true scores, a five-phone product fan."],
+  ["09-daydream","daydream","AI SEO","Warm paper and pastel bands — a hand-drawn wordmark reveal and the site's own illustrations."],
+  ["10-corgi","Corgi","Startup Insurance","Paper-white world with painted skies — the official corgi mascot family, Weeks vs Minutes."],
+  ["11-orchid","Orchid","iMessage Assistant","Paper-to-dusk dual world — five petals converge into the mark; real conversations bubble up."],
+  ["12-therasun","TheraSun","Spectral Window Film","Warm-black amber world — a film pulls down, the spectrum splits, 620-670nm blooms."],
+  ["13-idensia","Idensia","Brand Passport","Deep-forest engraving world — a passport assembles in under a minute, then routes to its audience."],
+  ["14-laper","Laper","Screenwriting Software","Screenplay-paper world — FADE IN:, a kraft archive atlas of 65 countries, film-noir jazz."],
+];
+const grid = document.getElementById("grid");
+FILMS.forEach(([file, brand, cat, world], i) => {
+  const el = document.createElement("div");
+  el.className = "card";
+  el.innerHTML = `
+    <video preload="none" poster="posters/${file}.jpg" controls playsinline src="films/${file}.mp4"></video>
+    <div class="meta">
+      <div class="idx">${String(i+1).padStart(2,"0")} / 14</div>
+      <div class="name">${brand} <span class="cat">${cat}</span></div>
+      <div class="world">${world}</div>
+    </div>`;
+  grid.appendChild(el);
+});
+// 滚动进入视口才载入 metadata (省流量)
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.preload = "metadata"; io.unobserve(e.target); }
+}), { rootMargin: "300px" });
+document.querySelectorAll("video").forEach(v => io.observe(v));
+// 同时只播一个
+document.querySelectorAll("video").forEach(v => v.addEventListener("play", () => {
+  document.querySelectorAll("video").forEach(o => { if (o !== v) o.pause(); });
+}));
+</script>
+
+</body>
+</html>
