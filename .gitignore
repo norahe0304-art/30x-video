@@ -10,6 +10,7 @@ build/
 output/
 *.mp4
 !skills/30x-video/examples/**/*.mp4
+!docs/films/*.mp4
 *.wav
 !skills/30x-video/examples/**/*.wav
 *.mp3
