@@ -26,8 +26,10 @@ const HELP = `
 
 Usage:
   npx 30x-web-to-video <brand-url> [--out <dir>] [--agent] [--no-harvest]
+  npx 30x-web-to-video --global              # install skill for ALL projects (~/.claude/skills)
 
 Options:
+  --global       Install the skill user-wide (~/.claude/skills) instead of per-project
   --out <dir>    Output project directory (default: ./<brand>-launch-video)
   --agent        After harvest, launch Claude Code on the build prompt
                  (requires the \`claude\` CLI; agent time/tokens are yours)
@@ -47,9 +49,9 @@ Optional: ELEVENLABS_API_KEY in the project .env for premium narration
 (falls back to Kokoro local TTS — zero keys needed).
 `;
 
-if (!url || flags.has("--help") || flags.has("-h")) {
+if (flags.has("--help") || flags.has("-h") || (!url && !flags.has("--global"))) {
   console.log(HELP.trim());
-  process.exit(url ? 0 : 1);
+  process.exit(url || flags.has("--global") ? 0 : 1);
 }
 
 const slug = (() => {
@@ -66,10 +68,17 @@ const outDir = resolve(outIdx > -1 && args[outIdx + 1] ? args[outIdx + 1] : `./$
 
 // ── 1) install the skill into the project-local .claude/skills ──────────
 const skillSrc = join(__dirname, "skill");
-const skillDst = join(process.cwd(), ".claude", "skills", "30x-web-to-video");
+const skillDst = flags.has("--global")
+  ? join(process.env.HOME || process.cwd(), ".claude", "skills", "30x-web-to-video")
+  : join(process.cwd(), ".claude", "skills", "30x-web-to-video");
 mkdirSync(dirname(skillDst), { recursive: true });
 cpSync(skillSrc, skillDst, { recursive: true });
 console.log(`✔ skill installed → ${skillDst}`);
+
+if (flags.has("--global") && !url) {
+  console.log("✔ skill installed user-wide. Open Claude Code anywhere and say: 给 <brand-url> 做个 launch video");
+  process.exit(0);
+}
 
 // ── 2) deterministic harvest + scaffold ─────────────────────────────────
 if (!flags.has("--no-harvest")) {
