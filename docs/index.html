@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>30x web-to-video — One URL in, an agency-grade launch video out</title>
-<meta name="description" content="14 brands, 14 visual worlds, zero templates. A Claude Code skill that turns any brand URL into an agency-grade launch video.">
-<meta property="og:title" content="30x web-to-video — 14 brands, 14 worlds, zero templates">
+<meta name="description" content="13 brands, 13 visual worlds, zero templates. A Claude Code skill that turns any brand URL into an agency-grade launch video.">
+<meta property="og:title" content="30x web-to-video — 13 brands, 13 worlds, zero templates">
 <meta property="og:description" content="One npx command turns any brand URL into an agency-grade launch video. Taste encoded as code.">
 <meta property="og:image" content="https://norahe0304-art.github.io/30x-video/posters/05-mana.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -56,7 +56,7 @@
   <div class="eyebrow">30x · Web to Video · Claude Code Skill</div>
   <h1>One URL in.<br><span class="soft">An agency-grade launch video out.</span></h1>
   <div class="sub">
-    14 brands, 14 visual worlds, zero templates. Every film below was generated from nothing but the brand's own website —
+    13 brands, 13 visual worlds, zero templates. Every film below was generated from nothing but the brand's own website —
     real assets, real copy, a 5-act narrative, word-aligned voiceover, and a taste codex of 16 hard-won design laws.
     Six of them were built by autonomous agents reading only the rules.
   </div>
@@ -88,13 +88,12 @@ const FILMS = [
   ["05-mana","Maná","Yerba Mate","Four flavor-colored rooms — the site's own Neue Montreal type, a nutrition panel as typography."],
   ["06-cofounder","Cofounder","AI Agent","Pixel-pastoral world — the agent saw through a mobbin wrapper and harvested the real site."],
   ["07-jetpartners","JetPartners","Private Aviation","Navy old-money world — night-city aerials, serif lockups, not a single loud frame."],
-  ["08-biuty","biuty","Beauty AI","Lavender world — real face-scan footage, giant true scores, a five-phone product fan."],
-  ["09-daydream","daydream","AI SEO","Warm paper and pastel bands — a hand-drawn wordmark reveal and the site's own illustrations."],
   ["10-corgi","Corgi","Startup Insurance","Paper-white world with painted skies — the official corgi mascot family, Weeks vs Minutes."],
   ["11-orchid","Orchid","iMessage Assistant","Paper-to-dusk dual world — five petals converge into the mark; real conversations bubble up."],
   ["12-therasun","TheraSun","Spectral Window Film","Warm-black amber world — a film pulls down, the spectrum splits, 620-670nm blooms."],
   ["13-idensia","Idensia","Brand Passport","Deep-forest engraving world — a passport assembles in under a minute, then routes to its audience."],
   ["14-laper","Laper","Screenwriting Software","Screenplay-paper world — FADE IN:, a kraft archive atlas of 65 countries, film-noir jazz."],
+  ["15-dusty","Dusty & Co","Ceramic Studio · via Brand Passport","Risograph print world — fed only a hosted passport page, the agent found the real NYC studio and its riso design language."],
 ];
 const grid = document.getElementById("grid");
 FILMS.forEach(([file, brand, cat, world], i) => {
@@ -103,7 +102,7 @@ FILMS.forEach(([file, brand, cat, world], i) => {
   el.innerHTML = `
     <video preload="none" poster="posters/${file}.jpg" controls playsinline src="films/${file}.mp4"></video>
     <div class="meta">
-      <div class="idx">${String(i+1).padStart(2,"0")} / 14</div>
+      <div class="idx">${String(i+1).padStart(2,"0")} / ${FILMS.length}</div>
       <div class="name">${brand} <span class="cat">${cat}</span></div>
       <div class="world">${world}</div>
     </div>`;
