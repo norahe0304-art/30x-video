@@ -74,12 +74,12 @@ skills/30x-web-to-video/
 | 05 | Maná — yerba mate | four flavor-colored rooms *(agent-built)* |
 | 06 | Cofounder — AI agent | pixel-pastoral; saw through a wrapper site *(agent-built)* |
 | 07 | JetPartners — private aviation | navy old-money, night aerials |
-| 10 | Corgi — startup insurance | painted skies, official mascot family *(agent-built)* |
-| 11 | Orchid — iMessage assistant | paper-to-dusk, petals converge into the mark *(agent-built)* |
-| 12 | TheraSun — spectral window film | warm-black amber, the spectrum splits |
-| 13 | Idensia — brand passport | deep-forest engraving world |
-| 14 | Laper — screenwriting software | screenplay paper, FADE IN:, film-noir jazz |
-| 15 | Dusty & Co — ceramic studio | risograph print world; found the real brand behind a hosted passport page *(agent-built)* |
+| 08 | Corgi — startup insurance | painted skies, official mascot family *(agent-built)* |
+| 09 | Orchid — iMessage assistant | paper-to-dusk, petals converge into the mark *(agent-built)* |
+| 10 | TheraSun — spectral window film | warm-black amber, the spectrum splits |
+| 11 | Idensia — brand passport | deep-forest engraving world |
+| 12 | Laper — screenwriting software | screenplay paper, FADE IN:, film-noir jazz |
+| 13 | Dusty & Co — ceramic studio | risograph print world; found the real brand behind a hosted passport page *(agent-built)* |
 
 **[▶ Watch them all](https://norahe0304-art.github.io/30x-video/)**
 
