@@ -23,10 +23,14 @@ npx 30x-web-to-video --global
 # → open Claude Code anywhere and say: "make a launch video for your-brand.com"
 ```
 
-Requirements: **Node 20+** and **[Claude Code](https://claude.com/claude-code)**.
-Everything else (ffmpeg, yt-dlp, playwright) auto-installs during harvest.
-An `ELEVENLABS_API_KEY` in the project `.env` gets you premium narration;
-without one it falls back to local TTS — zero keys needed.
+## Requirements & expectations
+
+- **macOS / Linux** (Windows untested)
+- **Node 20+** and **[Claude Code](https://claude.com/claude-code)** (any paid plan)
+- One full run takes **~25 minutes** and a meaningful chunk of agent tokens — it is doing real work: harvesting, designing five acts, rendering proof frames, self-reviewing
+- Best results with the strongest model your plan offers — the taste codex holds the floor on any model; the ceiling scales with the model
+- `ELEVENLABS_API_KEY` in the project `.env` gets premium narration; without it, narration falls back to local TTS (works, sounds simpler)
+- ffmpeg / yt-dlp / playwright auto-install during harvest
 
 ## How it works
 
