@@ -3,125 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>30X — Web-to-Video Films</title>
-<meta name="description" content="One URL in. An agency-grade launch video out. A Claude Code skill.">
-<meta property="og:title" content="30X — Web-to-Video Films">
+<title>30X — Web-to-Video</title>
+<meta name="description" content="One URL in. An agency-grade launch video out.">
+<meta property="og:title" content="30X — Web-to-Video">
 <meta property="og:description" content="One URL in. An agency-grade launch video out. Zero templates.">
 <meta property="og:image" content="https://norahe0304-art.github.io/30x-video/posters/07-jetpartners.jpg">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --ivory: #F7F6F2; --ink: #121211; --muted: #6f6e6a; --hair: rgba(18,18,17,0.16); }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--ivory); color: var(--ink);
-    font-family: "Didot", "Bodoni 72", "Playfair Display", Georgia, "Times New Roman", serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  .sans { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
-  .mono { font-family: "SF Mono", Menlo, monospace; }
+  :root { --ivory: #F7F6F4; --ink: #1a1a1a; --mut: #6b6b68; }
+  body { background: var(--ivory); color: var(--ink); font-family: "Inter", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  .serif { font-family: "Cormorant Garamond", Georgia, serif; }
   a { color: inherit; }
 
-  /* ── hero: dior split ── */
-  .hero { position: relative; height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
-  .hero-media { position: relative; overflow: hidden; background: #000; }
-  .hero-media video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.72) contrast(1.05); }
-  .hero-blank { background: var(--ivory); }
+  /* ── split hero (dior verbatim grammar) ── */
+  .hero { position: relative; height: 100vh; background: var(--ivory); }
+  .hero-half { position: absolute; left: 0; top: 0; width: 50%; height: 100%; overflow: hidden; background: #0c0c0c; }
+  .hero-half video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.62) contrast(1.06); }
   .wordmark {
-    position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); z-index: 5;
-    font-size: clamp(84px, 13vw, 210px); letter-spacing: 0.16em; font-weight: 400;
-    color: #fff; mix-blend-mode: difference; white-space: nowrap;
-    opacity: 0; transition: opacity 2s ease .4s;
+    position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 4;
+    font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500;
+    font-size: clamp(72px, 9.5vw, 150px); letter-spacing: 0.34em; text-indent: 0.34em;
+    color: #fff; white-space: nowrap; opacity: 0; transition: opacity 2.2s ease .3s;
   }
   .wordmark.in { opacity: 1; }
-  .hero-cap {
-    position: absolute; left: 25%; bottom: 9vh; transform: translateX(-50%); z-index: 6; text-align: center;
-    color: #fff; opacity: 0; transition: opacity 1.6s ease 1.2s;
-  }
+  .hero-cap { position: absolute; left: 25%; bottom: 7.5vh; transform: translateX(-50%); z-index: 5; text-align: center; color: #EDEBE6;
+    opacity: 0; transition: opacity 1.8s ease 1s; }
   .hero-cap.in { opacity: 1; }
-  .hero-cap .t { font-size: clamp(22px, 2.6vw, 34px); letter-spacing: 0.04em; }
-  .hero-cap a { display: inline-block; margin-top: 14px; font-size: 13px; letter-spacing: 0.08em; color: rgba(255,255,255,0.85); }
-  .hero-cap2 {
-    position: absolute; right: 25%; bottom: 9vh; transform: translateX(50%); z-index: 6; text-align: center;
-    opacity: 0; transition: opacity 1.6s ease 1.5s;
-  }
+  .hero-cap .t { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; font-size: clamp(26px, 2.8vw, 40px); letter-spacing: 0.02em; }
+  .hero-cap a { display: inline-block; margin-top: 13px; font-size: 12px; font-weight: 400; letter-spacing: 0.06em; color: #EDEBE6; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 0.5px; }
+  .hero-cap2 { position: absolute; left: 75%; bottom: 7.5vh; transform: translateX(-50%); z-index: 5; text-align: center;
+    opacity: 0; transition: opacity 1.8s ease 1.3s; }
   .hero-cap2.in { opacity: 1; }
-  .hero-cap2 .t { font-size: clamp(22px, 2.6vw, 34px); letter-spacing: 0.04em; }
-  .hero-cap2 code { display: inline-block; margin-top: 14px; font-size: 12px; letter-spacing: 0.04em; color: var(--muted);
-    font-family: "SF Mono", Menlo, monospace; border-bottom: 1px solid var(--hair); padding-bottom: 3px; cursor: pointer; }
+  .hero-cap2 .t { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(26px, 2.8vw, 40px); letter-spacing: 0.02em; }
+  .hero-cap2 code { display: inline-block; margin-top: 13px; font-size: 12px; color: var(--mut); font-family: "Inter", sans-serif;
+    text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 0.5px; cursor: pointer; }
 
-  /* ── maison line ── */
-  .maison { text-align: center; padding: clamp(70px, 11vh, 120px) 24px clamp(30px, 5vh, 60px); }
-  .maison .line { font-size: clamp(17px, 1.9vw, 24px); letter-spacing: 0.05em; line-height: 1.9; max-width: 860px; margin: 0 auto; }
-  .maison .stats { margin-top: 26px; font-size: 11px; letter-spacing: 0.34em; color: var(--muted); text-transform: uppercase; }
-  .maison .stats b { color: var(--ink); font-weight: 400; }
+  /* ── section label ── */
+  .slabel { text-align: center; padding: clamp(80px, 12vh, 130px) 24px clamp(34px, 5vh, 54px);
+    font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: var(--mut); }
 
-  /* ── collections ── */
-  .collection { padding: clamp(70px, 11vh, 130px) clamp(18px, 4vw, 70px) 0; }
-  .chead { text-align: center; margin-bottom: clamp(40px, 6vh, 70px); }
-  .chead .n { font-size: 11px; letter-spacing: 0.4em; color: var(--muted); text-transform: uppercase; }
-  .chead h2 { margin-top: 14px; font-weight: 400; font-size: clamp(30px, 4.4vw, 58px); letter-spacing: 0.06em; }
-  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 1.1s ease, transform 1.2s cubic-bezier(.2,.7,.2,1); }
+  /* ── dior push rows: two half-width blocks, caption ON image bottom-center ── */
+  .row { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+  .push { position: relative; overflow: hidden; background: #0c0c0c; cursor: pointer; }
+  .push video { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block;
+    filter: grayscale(1) brightness(0.68); transition: filter 1s ease; }
+  .push:hover video, .push.playing video { filter: none; }
+  .pcap { position: absolute; left: 50%; bottom: 6.5%; transform: translateX(-50%); text-align: center; color: #EFEDE8; z-index: 3; pointer-events: none; }
+  .pcap .t { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: 0.02em; text-shadow: 0 2px 22px rgba(0,0,0,0.4); }
+  .pcap .s { margin-top: 10px; font-size: 11.5px; letter-spacing: 0.08em; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 0.5px; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 1.3s ease, transform 1.4s ease; }
   .reveal.in { opacity: 1; transform: none; }
 
-  .duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: clamp(26px, 3.4vw, 54px); max-width: 1480px; margin: 0 auto; }
-  .solo { max-width: 1180px; margin: 0 auto clamp(40px, 7vh, 80px); }
-  .film { cursor: pointer; }
-  .film video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
-  .fcap { text-align: center; padding: 20px 0 42px; }
-  .fcap .b { font-size: clamp(19px, 2vw, 25px); letter-spacing: 0.05em; }
-  .fcap .t { margin-top: 7px; font-size: 10.5px; letter-spacing: 0.32em; color: var(--muted); text-transform: uppercase; }
+  /* ── atelier note ── */
+  .note { text-align: center; max-width: 640px; margin: 0 auto; padding: 0 24px clamp(34px, 5vh, 54px);
+    font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(19px, 2vw, 24px); line-height: 1.75; color: var(--ink); }
 
-  /* ── atelier (dusty) ── */
-  .atelier { margin-top: clamp(90px, 14vh, 160px); padding: clamp(80px, 12vh, 140px) clamp(18px, 4vw, 70px); background: var(--ink); color: var(--ivory); }
-  .atelier .chead .n { color: rgba(247,246,242,0.5); }
-  .atelier .fcap .t { color: rgba(247,246,242,0.5); }
-  .atelier p { text-align: center; max-width: 700px; margin: 0 auto clamp(46px, 7vh, 70px); font-size: clamp(16px, 1.8vw, 21px); letter-spacing: 0.04em; line-height: 1.9; color: rgba(247,246,242,0.8); }
-
-  /* ── footer ── */
-  footer { text-align: center; padding: clamp(100px, 15vh, 180px) 24px 90px; }
-  .fmark { font-size: clamp(54px, 7vw, 110px); letter-spacing: 0.18em; }
-  .fcmd { margin-top: 36px; }
-  .fcmd code { font-family: "SF Mono", Menlo, monospace; font-size: 13px; letter-spacing: 0.04em; color: var(--ink);
-    border-bottom: 1px solid var(--hair); padding-bottom: 4px; cursor: pointer; }
-  .flinks { margin-top: 44px; font-size: 11px; letter-spacing: 0.34em; color: var(--muted); text-transform: uppercase; display: flex; gap: 42px; justify-content: center; flex-wrap: wrap; }
+  footer { text-align: center; padding: clamp(110px, 16vh, 190px) 24px 100px; }
+  .fmark { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; font-size: clamp(46px, 5.5vw, 84px); letter-spacing: 0.34em; text-indent: 0.34em; }
+  .fcmd { margin-top: 30px; }
+  .fcmd code { font-size: 12.5px; color: var(--ink); font-family: "Inter", sans-serif;
+    text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 0.5px; cursor: pointer; }
+  .flinks { margin-top: 40px; font-size: 11px; letter-spacing: 0.4em; color: var(--mut); text-transform: uppercase;
+    display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
   .flinks a { text-decoration: none; }
-  .flinks a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
 
 <div class="hero">
-  <div class="hero-media">
-    <video id="herov" autoplay muted loop playsinline src="films/07-jetpartners.mp4" poster="posters/07-jetpartners.jpg"></video>
-  </div>
-  <div class="hero-blank"></div>
+  <div class="hero-half"><video autoplay muted loop playsinline src="films/07-jetpartners.mp4" poster="posters/07-jetpartners.jpg"></video></div>
   <div class="wordmark" id="wm">30X</div>
-  <div class="hero-cap" id="cap1">
-    <div class="t">Web-to-Video Films</div>
-    <a href="#collections">Explore the collections</a>
+  <div class="hero-cap" id="c1">
+    <div class="t serif">Web-to-Video Films</div>
+    <a href="#films">Discover</a>
   </div>
-  <div class="hero-cap2" id="cap2">
-    <div class="t" style="color:var(--ink)">One URL in. A film out.</div>
+  <div class="hero-cap2" id="c2">
+    <div class="t serif">One URL in. A film out.</div>
     <code onclick="navigator.clipboard.writeText('npx 30x-web-to-video --global')">npx 30x-web-to-video --global</code>
   </div>
 </div>
 
-<div class="maison reveal">
-  <div class="line">Sixteen brands entered as web addresses and left as films — each grown from its own colors, type and archives. Nothing here is a template; everything is a law.</div>
-  <div class="stats"><b>≈200</b> motion moves · <b>16</b> taste laws · <b>4</b> evidence gates · <b>0</b> templates</div>
-</div>
-
-<main id="collections"></main>
-
-<div class="atelier">
-  <div class="chead reveal">
-    <div class="n">The Atelier</div>
-    <h2>Same house, two creations</h2>
-  </div>
-  <p class="reveal">The same brand, commissioned twice. Each run cuts its own cloth — different opening, different palette, different music. Never the same film twice.</p>
-  <div class="duo" id="takes"></div>
-</div>
+<main id="films"></main>
 
 <footer>
   <div class="fmark">30X</div>
@@ -129,72 +97,67 @@
   <div class="flinks">
     <a href="https://github.com/norahe0304-art/30x-video" target="_blank">GitHub</a>
     <a href="https://www.npmjs.com/package/30x-web-to-video" target="_blank">npm</a>
-    <span>MIT · Built with Claude Code</span>
+    <span>Built with Claude Code</span>
   </div>
 </footer>
 
 <script>
-setTimeout(() => document.getElementById("wm").classList.add("in"), 200);
-setTimeout(() => document.getElementById("cap1").classList.add("in"), 600);
-setTimeout(() => document.getElementById("cap2").classList.add("in"), 800);
+setTimeout(() => document.getElementById("wm").classList.add("in"), 150);
+setTimeout(() => document.getElementById("c1").classList.add("in"), 500);
+setTimeout(() => document.getElementById("c2").classList.add("in"), 700);
 
-const SECTIONS = [
-  { n: "Collection No.1", title: "Colour & Craft",
-    films: [["05-mana","Maná","Yerba Mate"],["10-corgi","Corgi","Startup Insurance"],["06-cofounder","Cofounder","AI Agent"],["04-parker","Parker","AI Banking"]] },
-  { n: "Collection No.2", title: "Paper & Ink",
-    films: [["14-laper","Laper","Screenwriting"],["11-orchid","Orchid","iMessage Assistant"]] },
-  { n: "Collection No.3", title: "Night & Light",
-    films: [["12-therasun","TheraSun","Spectral Window Film"],["18-solounicorn","Solo Unicorn Club","Founder Community"],["01-happy-model","Happy Model","AI Gateway"],["13-idensia","Idensia","Brand Passport"]] },
-  { n: "Collection No.4", title: "Quiet Luxury",
-    films: [["07-jetpartners","JetPartners","Private Aviation"],["02-caylent","Caylent","AWS Consulting"]] },
+const GROUPS = [
+  { label: "Colour & Craft", films: [
+    ["05-mana","Maná"],["10-corgi","Corgi"],["06-cofounder","Cofounder"],["04-parker","Parker"]] },
+  { label: "Paper & Ink", films: [
+    ["14-laper","Laper"],["11-orchid","Orchid"]] },
+  { label: "Night & Light", films: [
+    ["12-therasun","TheraSun"],["18-solounicorn","Solo Unicorn Club"],["01-happy-model","Happy Model"],["13-idensia","Idensia"]] },
+  { label: "Quiet Luxury", films: [
+    ["07-jetpartners","JetPartners"],["02-caylent","Caylent"]] },
 ];
 
-function filmCard([f, b, t]) {
+function push([f, b]) {
   return `
-  <div class="film">
+  <div class="push" data-f="${f}">
     <video preload="none" poster="posters/${f}.jpg" playsinline loop muted src="films/${f}.mp4"></video>
-    <div class="fcap"><div class="b">${b}</div><div class="t">${t}</div></div>
+    <div class="pcap"><div class="t">${b}</div><div class="s">Watch the film</div></div>
   </div>`;
 }
 
-const main = document.getElementById("collections");
-SECTIONS.forEach(sec => {
-  const el = document.createElement("div");
-  el.className = "collection";
-  const lead = sec.films[0], rest = sec.films.slice(1);
-  el.innerHTML = `
-    <div class="chead reveal">
-      <div class="n">${sec.n}</div>
-      <h2>${sec.title}</h2>
-    </div>
-    <div class="solo reveal">${filmCard(lead)}</div>
-    ${rest.length ? `<div class="duo">${rest.map(filmCard).join("")}</div>` : ""}`;
-  main.appendChild(el);
+const main = document.getElementById("films");
+GROUPS.forEach(g => {
+  const rows = [];
+  for (let i = 0; i < g.films.length; i += 2) rows.push(g.films.slice(i, i + 2));
+  main.insertAdjacentHTML("beforeend", `
+    <div class="slabel reveal">${g.label}</div>
+    ${rows.map(r => `<div class="row reveal">${r.map(push).join("")}</div>`).join("")}`);
 });
 
-document.getElementById("takes").innerHTML =
-  filmCard(["15-dusty","Dusty & Co","Take One"]) + filmCard(["17-dusty-v2","Dusty & Co","Take Two"]);
+main.insertAdjacentHTML("beforeend", `
+  <div class="slabel reveal">The Atelier</div>
+  <div class="note reveal serif">The same brand, commissioned twice. Each run cuts its own cloth — never the same film twice.</div>
+  <div class="row reveal">${push(["15-dusty","Dusty & Co — Take One"])}${push(["17-dusty-v2","Dusty & Co — Take Two"])}</div>`);
 
 const ro = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); }
 }), { rootMargin: "-40px" });
 document.querySelectorAll(".reveal").forEach(el => ro.observe(el));
-document.querySelectorAll(".collection .film, .atelier .film").forEach(el => { el.classList.add("reveal"); ro.observe(el); });
 
-document.querySelectorAll(".film").forEach(card => {
+document.querySelectorAll(".push").forEach(card => {
   const v = card.querySelector("video");
   card.addEventListener("mouseenter", () => { v.muted = true; v.play().catch(()=>{}); });
-  card.addEventListener("mouseleave", () => { if (v.muted) { v.pause(); v.currentTime = 0; } });
+  card.addEventListener("mouseleave", () => { if (v.muted) { v.pause(); v.currentTime = 0; card.classList.remove("playing"); } });
   card.addEventListener("click", () => {
-    document.querySelectorAll(".film video").forEach(o => { if (o !== v) { o.pause(); o.muted = true; o.controls = false; } });
-    if (v.muted) { v.muted = false; v.controls = true; v.play().catch(()=>{}); }
+    document.querySelectorAll(".push video").forEach(o => { if (o !== v) { o.pause(); o.muted = true; o.controls = false; o.closest(".push").classList.remove("playing"); } });
+    v.muted = false; v.controls = true; card.classList.add("playing"); v.play().catch(()=>{});
   });
 });
 
 const vio = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.preload = "metadata"; vio.unobserve(e.target); }
 }), { rootMargin: "500px" });
-document.querySelectorAll(".film video").forEach(v => vio.observe(v));
+document.querySelectorAll(".push video").forEach(v => vio.observe(v));
 </script>
 
 </body>
