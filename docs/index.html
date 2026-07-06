@@ -101,14 +101,11 @@ const tile = ([f, b]) => `
 const cap = ([f, b]) => `<div class="tcap" data-f="${f}" data-n="${b}"><div class="n">${b}</div><div class="w">Watch the film</div></div>`;
 
 const main = document.getElementById("plp");
+const cell = f => `<div>${tile(f)}${cap(f)}</div>`;
 GROUPS.forEach(g => {
-  // 3 列: 每行 3 tile + 对应字幕行
   let html = `<div class="plp-label reveal">${g.label}</div>`;
   for (let i = 0; i < g.films.length; i += 3) {
-    const row = g.films.slice(i, i + 3);
-    while (row.length < 3 && g.films.length > 3) break;
-    html += `<div class="grid3 reveal">${row.map(tile).join("")}</div>`;
-    html += `<div class="grid3" style="gap:2px">${row.map(cap).join("")}</div>`;
+    html += `<div class="grid3 reveal">${g.films.slice(i, i + 3).map(cell).join("")}</div>`;
   }
   main.insertAdjacentHTML("beforeend", html);
 });
