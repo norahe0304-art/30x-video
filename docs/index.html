@@ -3,156 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>30x web-to-video</title>
+<title>30X — Web-to-Video Films</title>
 <meta name="description" content="One URL in. An agency-grade launch video out. A Claude Code skill.">
-<meta property="og:title" content="30x web-to-video">
+<meta property="og:title" content="30X — Web-to-Video Films">
 <meta property="og:description" content="One URL in. An agency-grade launch video out. Zero templates.">
-<meta property="og:image" content="https://norahe0304-art.github.io/30x-video/posters/05-mana.jpg">
+<meta property="og:image" content="https://norahe0304-art.github.io/30x-video/posters/07-jetpartners.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --bg: #070708; --ink: #F2F0EA; --muted: rgba(242,240,234,0.55); --dim: rgba(242,240,234,0.26); --green: #46E397; }
+  :root { --ivory: #F7F6F2; --ink: #121211; --muted: #6f6e6a; --hair: rgba(18,18,17,0.16); }
   html { scroll-behavior: smooth; }
-  ::selection { background: var(--green); color: #000; }
   body {
-    background: var(--bg); color: var(--ink);
-    font-family: -apple-system, "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
-    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    background: var(--ivory); color: var(--ink);
+    font-family: "Didot", "Bodoni 72", "Playfair Display", Georgia, "Times New Roman", serif;
+    -webkit-font-smoothing: antialiased;
   }
+  .sans { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
   .mono { font-family: "SF Mono", Menlo, monospace; }
+  a { color: inherit; }
 
-  /* cursor glow */
-  #glow { position: fixed; width: 560px; height: 560px; border-radius: 50%; pointer-events: none; z-index: 0;
-    background: radial-gradient(circle, rgba(70,227,151,0.07) 0%, transparent 62%);
-    transform: translate(-50%,-50%); left: 50vw; top: 30vh; transition: left .25s ease-out, top .25s ease-out; }
+  /* ── hero: dior split ── */
+  .hero { position: relative; height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+  .hero-media { position: relative; overflow: hidden; background: #000; }
+  .hero-media video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.72) contrast(1.05); }
+  .hero-blank { background: var(--ivory); }
+  .wordmark {
+    position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); z-index: 5;
+    font-size: clamp(84px, 13vw, 210px); letter-spacing: 0.16em; font-weight: 400;
+    color: #fff; mix-blend-mode: difference; white-space: nowrap;
+    opacity: 0; transition: opacity 2s ease .4s;
+  }
+  .wordmark.in { opacity: 1; }
+  .hero-cap {
+    position: absolute; left: 25%; bottom: 9vh; transform: translateX(-50%); z-index: 6; text-align: center;
+    color: #fff; opacity: 0; transition: opacity 1.6s ease 1.2s;
+  }
+  .hero-cap.in { opacity: 1; }
+  .hero-cap .t { font-size: clamp(22px, 2.6vw, 34px); letter-spacing: 0.04em; }
+  .hero-cap a { display: inline-block; margin-top: 14px; font-size: 13px; letter-spacing: 0.08em; color: rgba(255,255,255,0.85); }
+  .hero-cap2 {
+    position: absolute; right: 25%; bottom: 9vh; transform: translateX(50%); z-index: 6; text-align: center;
+    opacity: 0; transition: opacity 1.6s ease 1.5s;
+  }
+  .hero-cap2.in { opacity: 1; }
+  .hero-cap2 .t { font-size: clamp(22px, 2.6vw, 34px); letter-spacing: 0.04em; }
+  .hero-cap2 code { display: inline-block; margin-top: 14px; font-size: 12px; letter-spacing: 0.04em; color: var(--muted);
+    font-family: "SF Mono", Menlo, monospace; border-bottom: 1px solid var(--hair); padding-bottom: 3px; cursor: pointer; }
 
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 60; display: flex; justify-content: space-between; align-items: center;
-    padding: 20px clamp(20px, 4vw, 64px); mix-blend-mode: difference; }
-  .navmark { font-weight: 800; font-size: 15px; letter-spacing: -0.02em; color: #fff; }
-  .navlinks { display: flex; gap: 26px; }
-  .navlinks a { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.6); text-decoration: none; text-transform: uppercase; }
-  .navlinks a:hover { color: #fff; }
+  /* ── maison line ── */
+  .maison { text-align: center; padding: clamp(70px, 11vh, 120px) 24px clamp(30px, 5vh, 60px); }
+  .maison .line { font-size: clamp(17px, 1.9vw, 24px); letter-spacing: 0.05em; line-height: 1.9; max-width: 860px; margin: 0 auto; }
+  .maison .stats { margin-top: 26px; font-size: 11px; letter-spacing: 0.34em; color: var(--muted); text-transform: uppercase; }
+  .maison .stats b { color: var(--ink); font-weight: 400; }
 
-  /* hero */
-  .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
-    padding: 0 clamp(20px, 5vw, 90px); z-index: 1; }
-  .eyebrow { font-size: 12px; letter-spacing: 7px; color: var(--green); text-transform: uppercase; margin-bottom: 40px;
-    opacity: 0; transform: translateY(12px); transition: all .8s ease .1s; }
-  .eyebrow.in { opacity: 1; transform: none; }
-  h1 { font-weight: 800; font-size: clamp(52px, 10.5vw, 168px); line-height: 0.98; letter-spacing: -0.045em; text-transform: uppercase; }
-  h1 .row { display: block; overflow: hidden; }
-  h1 .txt { display: inline-block; transform: translateY(110%); transition: transform 1.1s cubic-bezier(.16,.8,.18,1); }
-  h1 .row.in .txt { transform: none; }
-  h1 .out { color: transparent; -webkit-text-stroke: 1.5px rgba(242,240,234,0.85); }
-  h1 .g { color: var(--green); }
-  .hero-sub { margin-top: 44px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
-    opacity: 0; transform: translateY(14px); transition: all .9s ease 1.1s; }
-  .hero-sub.in { opacity: 1; transform: none; }
-  .cmd { font-family: "SF Mono", Menlo, monospace; font-weight: 600; font-size: clamp(13px, 1.4vw, 15px); color: #000;
-    background: var(--green); padding: 15px 26px; border-radius: 100px; cursor: pointer; user-select: all;
-    transition: transform .25s ease, box-shadow .25s ease; box-shadow: 0 0 0 rgba(70,227,151,0); }
-  .cmd:hover { transform: translateY(-2px); box-shadow: 0 12px 44px rgba(70,227,151,0.3); }
-  .sub-note { font-size: 13px; color: var(--muted); letter-spacing: 1px; }
-
-  /* poster marquee strip */
-  .strip { position: relative; overflow: hidden; padding: 40px 0 0; opacity: 0; transition: opacity 1.2s ease 1.4s; }
-  .strip.in { opacity: 1; }
-  .striptape { display: flex; gap: 18px; width: max-content; animation: slide 60s linear infinite; }
-  .striptape img { height: clamp(90px, 12vw, 150px); border-radius: 10px; filter: grayscale(1) brightness(0.8); transition: filter .4s ease; }
-  .striptape img:hover { filter: none; }
-  @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-  /* ticker */
-  .ticker { border-top: 1px solid rgba(242,240,234,0.1); border-bottom: 1px solid rgba(242,240,234,0.1);
-    overflow: hidden; padding: 15px 0; margin-top: 70px; }
-  .tape { display: flex; gap: 60px; white-space: nowrap; width: max-content; animation: slide 38s linear infinite; }
-  .tape span { font-family: "SF Mono", Menlo, monospace; font-size: 13px; letter-spacing: 3px; color: var(--muted); }
-  .tape b { color: var(--green); font-weight: 700; }
-
-  /* sections */
-  section { padding: clamp(90px, 14vh, 170px) clamp(20px, 5vw, 90px) 0; position: relative; z-index: 1; }
-  .shead { display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap; margin-bottom: 14px; }
-  .snum { font-family: "SF Mono", Menlo, monospace; font-size: 14px; color: var(--green); letter-spacing: 3px; }
-  h2 { font-weight: 800; font-size: clamp(38px, 6.4vw, 96px); letter-spacing: -0.04em; text-transform: uppercase; line-height: 1; }
-  h2.outline { color: transparent; -webkit-text-stroke: 1.2px rgba(242,240,234,0.75); }
-  .snote { font-size: 14px; color: var(--muted); letter-spacing: 0.5px; }
-  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .9s ease, transform 1s cubic-bezier(.16,.8,.18,1); }
+  /* ── collections ── */
+  .collection { padding: clamp(70px, 11vh, 130px) clamp(18px, 4vw, 70px) 0; }
+  .chead { text-align: center; margin-bottom: clamp(40px, 6vh, 70px); }
+  .chead .n { font-size: 11px; letter-spacing: 0.4em; color: var(--muted); text-transform: uppercase; }
+  .chead h2 { margin-top: 14px; font-weight: 400; font-size: clamp(30px, 4.4vw, 58px); letter-spacing: 0.06em; }
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 1.1s ease, transform 1.2s cubic-bezier(.2,.7,.2,1); }
   .reveal.in { opacity: 1; transform: none; }
 
-  .works { margin-top: 44px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(440px, 100%), 1fr)); gap: clamp(26px, 3vw, 46px); }
-  .film { position: relative; cursor: pointer; }
-  .vwrap { position: relative; border-radius: 14px; overflow: hidden; background: #000;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6); transition: transform .5s cubic-bezier(.16,.8,.18,1); }
-  .film:hover .vwrap { transform: translateY(-8px) scale(1.012); }
-  .film video { width: 100%; aspect-ratio: 16/9; display: block; }
-  .hint { position: absolute; right: 14px; bottom: 12px; font-family: "SF Mono", Menlo, monospace; font-size: 10px;
-    letter-spacing: 2px; color: rgba(255,255,255,0.75); background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
-    padding: 6px 12px; border-radius: 100px; opacity: 0; transition: opacity .3s ease; pointer-events: none; }
-  .film:hover .hint { opacity: 1; }
-  .fmeta { padding: 18px 2px 0; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
-  .fname { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
-  .ftag { font-family: "SF Mono", Menlo, monospace; font-size: 11px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; }
+  .duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: clamp(26px, 3.4vw, 54px); max-width: 1480px; margin: 0 auto; }
+  .solo { max-width: 1180px; margin: 0 auto clamp(40px, 7vh, 80px); }
+  .film { cursor: pointer; }
+  .film video { width: 100%; aspect-ratio: 16/9; display: block; background: #000; }
+  .fcap { text-align: center; padding: 20px 0 42px; }
+  .fcap .b { font-size: clamp(19px, 2vw, 25px); letter-spacing: 0.05em; }
+  .fcap .t { margin-top: 7px; font-size: 10.5px; letter-spacing: 0.32em; color: var(--muted); text-transform: uppercase; }
 
-  /* dusty lab */
-  .lab { margin: clamp(110px, 16vh, 190px) clamp(20px, 5vw, 90px) 0; border: 1px solid rgba(70,227,151,0.25);
-    border-radius: 26px; padding: clamp(36px, 5.5vw, 84px); position: relative; overflow: hidden;
-    background: radial-gradient(ellipse 900px 500px at 15% 0%, rgba(70,227,151,0.07), transparent 60%); }
-  .lab p { color: var(--muted); font-size: clamp(15px, 1.7vw, 19px); font-weight: 300; line-height: 1.75; max-width: 760px; margin-top: 22px; }
-  .lab p b { color: var(--green); font-weight: 600; }
-  .takes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: clamp(22px, 3vw, 42px); margin-top: 48px; }
+  /* ── atelier (dusty) ── */
+  .atelier { margin-top: clamp(90px, 14vh, 160px); padding: clamp(80px, 12vh, 140px) clamp(18px, 4vw, 70px); background: var(--ink); color: var(--ivory); }
+  .atelier .chead .n { color: rgba(247,246,242,0.5); }
+  .atelier .fcap .t { color: rgba(247,246,242,0.5); }
+  .atelier p { text-align: center; max-width: 700px; margin: 0 auto clamp(46px, 7vh, 70px); font-size: clamp(16px, 1.8vw, 21px); letter-spacing: 0.04em; line-height: 1.9; color: rgba(247,246,242,0.8); }
 
-  footer { padding: clamp(120px, 18vh, 220px) clamp(20px, 5vw, 90px) 100px; position: relative; z-index: 1; }
-  .fcta { font-weight: 800; font-size: clamp(40px, 8vw, 128px); letter-spacing: -0.045em; line-height: 0.98; text-transform: uppercase; }
-  .fcta .out { color: transparent; -webkit-text-stroke: 1.4px rgba(242,240,234,0.8); }
-  .fcta .g { color: var(--green); }
-  .fmono { margin-top: 54px; font-family: "SF Mono", Menlo, monospace; font-size: 12px; letter-spacing: 3px;
-    color: var(--dim); text-transform: uppercase; display: flex; gap: 36px; flex-wrap: wrap; }
-  .fmono a { color: inherit; text-decoration: none; }
-  .fmono a:hover { color: var(--ink); }
+  /* ── footer ── */
+  footer { text-align: center; padding: clamp(100px, 15vh, 180px) 24px 90px; }
+  .fmark { font-size: clamp(54px, 7vw, 110px); letter-spacing: 0.18em; }
+  .fcmd { margin-top: 36px; }
+  .fcmd code { font-family: "SF Mono", Menlo, monospace; font-size: 13px; letter-spacing: 0.04em; color: var(--ink);
+    border-bottom: 1px solid var(--hair); padding-bottom: 4px; cursor: pointer; }
+  .flinks { margin-top: 44px; font-size: 11px; letter-spacing: 0.34em; color: var(--muted); text-transform: uppercase; display: flex; gap: 42px; justify-content: center; flex-wrap: wrap; }
+  .flinks a { text-decoration: none; }
+  .flinks a:hover { color: var(--ink); }
 </style>
 </head>
 <body>
 
-<div id="glow"></div>
-
-<nav>
-  <div class="navmark">30x<span class="mono" style="font-size:11px;opacity:.7"> / web-to-video</span></div>
-  <div class="navlinks">
-    <a href="https://github.com/norahe0304-art/30x-video" target="_blank">GitHub</a>
-    <a href="https://www.npmjs.com/package/30x-web-to-video" target="_blank">npm</a>
-  </div>
-</nav>
-
 <div class="hero">
-  <div class="eyebrow mono" id="eyebrow">A Claude Code Skill · Zero Templates</div>
-  <h1 id="h1">
-    <span class="row"><span class="txt">One URL in.</span></span>
-    <span class="row"><span class="txt"><span class="out">A film</span> <span class="g">out.</span></span></span>
-  </h1>
-  <div class="hero-sub" id="herosub">
-    <code class="cmd" onclick="navigator.clipboard.writeText('npx 30x-web-to-video --global')">npx 30x-web-to-video --global</code>
-    <span class="sub-note">install once · then just tell Claude Code the URL</span>
+  <div class="hero-media">
+    <video id="herov" autoplay muted loop playsinline src="films/07-jetpartners.mp4" poster="posters/07-jetpartners.jpg"></video>
   </div>
-  <div class="strip" id="strip"><div class="striptape" id="striptape"></div></div>
+  <div class="hero-blank"></div>
+  <div class="wordmark" id="wm">30X</div>
+  <div class="hero-cap" id="cap1">
+    <div class="t">Web-to-Video Films</div>
+    <a href="#collections">Explore the collections</a>
+  </div>
+  <div class="hero-cap2" id="cap2">
+    <div class="t" style="color:var(--ink)">One URL in. A film out.</div>
+    <code onclick="navigator.clipboard.writeText('npx 30x-web-to-video --global')">npx 30x-web-to-video --global</code>
+  </div>
 </div>
 
-<div class="ticker"><div class="tape" id="tape"></div></div>
+<div class="maison reveal">
+  <div class="line">Sixteen brands entered as web addresses and left as films — each grown from its own colors, type and archives. Nothing here is a template; everything is a law.</div>
+  <div class="stats"><b>≈200</b> motion moves · <b>16</b> taste laws · <b>4</b> evidence gates · <b>0</b> templates</div>
+</div>
 
-<main id="main"></main>
+<main id="collections"></main>
 
-<div class="lab reveal">
-  <div class="shead">
-    <span class="snum mono">THE EXPERIMENT</span>
-    <h2>Same brand.<br>Two runs. <span style="color:var(--green)">Two films.</span></h2>
+<div class="atelier">
+  <div class="chead reveal">
+    <div class="n">The Atelier</div>
+    <h2>Same house, two creations</h2>
   </div>
-  <p>We fed the same brand in twice. No template survives this test — <b>every run grows its own world</b>: different opening, different palette, different music, different cuts. Never the same film twice.</p>
-  <div class="takes" id="takes"></div>
+  <p class="reveal">The same brand, commissioned twice. Each run cuts its own cloth — different opening, different palette, different music. Never the same film twice.</p>
+  <div class="duo" id="takes"></div>
 </div>
 
 <footer>
-  <div class="fcta reveal">Taste is not<br><span class="out">an adjective.</span><br>It's code. <span class="g">Run it.</span></div>
-  <div class="fmono reveal">
-    <span>npx 30x-web-to-video --global</span>
+  <div class="fmark">30X</div>
+  <div class="fcmd"><code onclick="navigator.clipboard.writeText('npx 30x-web-to-video --global')">npx 30x-web-to-video --global</code></div>
+  <div class="flinks">
     <a href="https://github.com/norahe0304-art/30x-video" target="_blank">GitHub</a>
     <a href="https://www.npmjs.com/package/30x-web-to-video" target="_blank">npm</a>
     <span>MIT · Built with Claude Code</span>
@@ -160,89 +134,67 @@
 </footer>
 
 <script>
-/* hero entrance */
-setTimeout(() => document.getElementById("eyebrow").classList.add("in"), 100);
-document.querySelectorAll("#h1 .row").forEach((r, i) => setTimeout(() => r.classList.add("in"), 250 + i * 180));
-setTimeout(() => document.getElementById("herosub").classList.add("in"), 900);
-setTimeout(() => document.getElementById("strip").classList.add("in"), 1100);
+setTimeout(() => document.getElementById("wm").classList.add("in"), 200);
+setTimeout(() => document.getElementById("cap1").classList.add("in"), 600);
+setTimeout(() => document.getElementById("cap2").classList.add("in"), 800);
 
-/* cursor glow */
-const glow = document.getElementById("glow");
-addEventListener("pointermove", e => { glow.style.left = e.clientX + "px"; glow.style.top = e.clientY + "px"; });
-
-/* data */
 const SECTIONS = [
-  { num: "01", title: "Color & Craft", outline: false, note: "worlds grown from packaging, mascots and pixels",
+  { n: "Collection No.1", title: "Colour & Craft",
     films: [["05-mana","Maná","Yerba Mate"],["10-corgi","Corgi","Startup Insurance"],["06-cofounder","Cofounder","AI Agent"],["04-parker","Parker","AI Banking"]] },
-  { num: "02", title: "Paper & Ink", outline: true, note: "editorial stock, courier ink, screenplay logic",
+  { n: "Collection No.2", title: "Paper & Ink",
     films: [["14-laper","Laper","Screenwriting"],["11-orchid","Orchid","iMessage Assistant"]] },
-  { num: "03", title: "Night & Light", outline: false, note: "dark rooms, warm practicals, spectra",
+  { n: "Collection No.3", title: "Night & Light",
     films: [["12-therasun","TheraSun","Spectral Window Film"],["18-solounicorn","Solo Unicorn Club","Founder Community"],["01-happy-model","Happy Model","AI Gateway"],["13-idensia","Idensia","Brand Passport"]] },
-  { num: "04", title: "Quiet Luxury", outline: true, note: "old money, deep water, mint on black",
+  { n: "Collection No.4", title: "Quiet Luxury",
     films: [["07-jetpartners","JetPartners","Private Aviation"],["02-caylent","Caylent","AWS Consulting"]] },
 ];
-const ALL = SECTIONS.flatMap(s => s.films);
 
-/* poster strip (doubled for seamless loop) */
-const st = document.getElementById("striptape");
-st.innerHTML = ALL.concat(ALL).map(([f]) => `<img src="posters/${f}.jpg" alt="">`).join("");
-
-/* ticker */
-const STATS = `<b>≈200</b> MOTION MOVES · <b>20+</b> TRANSITION FAMILIES · <b>16</b> TASTE LAWS · <b>4</b> EVIDENCE GATES · <b>WORD-ALIGNED</b> VO · <b>BEAT-SYNCED</b> MUSIC · <b>0</b> TEMPLATES · `;
-document.getElementById("tape").innerHTML = `<span>${STATS.repeat(3)}</span><span>${STATS.repeat(3)}</span>`;
-
-/* film card factory: hover-to-play */
 function filmCard([f, b, t]) {
   return `
-  <div class="film" data-f="${f}">
-    <div class="vwrap">
-      <video preload="none" poster="posters/${f}.jpg" playsinline loop muted src="films/${f}.mp4"></video>
-      <div class="hint">HOVER PREVIEW · CLICK FOR SOUND</div>
-    </div>
-    <div class="fmeta"><span class="fname">${b}</span><span class="ftag">${t}</span></div>
+  <div class="film">
+    <video preload="none" poster="posters/${f}.jpg" playsinline loop muted src="films/${f}.mp4"></video>
+    <div class="fcap"><div class="b">${b}</div><div class="t">${t}</div></div>
   </div>`;
 }
 
-/* sections */
-const main = document.getElementById("main");
+const main = document.getElementById("collections");
 SECTIONS.forEach(sec => {
-  const el = document.createElement("section");
+  const el = document.createElement("div");
+  el.className = "collection";
+  const lead = sec.films[0], rest = sec.films.slice(1);
   el.innerHTML = `
-    <div class="shead reveal">
-      <span class="snum mono">${sec.num}</span>
-      <h2 class="${sec.outline ? "outline" : ""}">${sec.title}</h2>
-      <span class="snote">${sec.note}</span>
+    <div class="chead reveal">
+      <div class="n">${sec.n}</div>
+      <h2>${sec.title}</h2>
     </div>
-    <div class="works">${sec.films.map(filmCard).join("")}</div>`;
+    <div class="solo reveal">${filmCard(lead)}</div>
+    ${rest.length ? `<div class="duo">${rest.map(filmCard).join("")}</div>` : ""}`;
   main.appendChild(el);
 });
 
-/* dusty takes */
 document.getElementById("takes").innerHTML =
   filmCard(["15-dusty","Dusty & Co","Take One"]) + filmCard(["17-dusty-v2","Dusty & Co","Take Two"]);
 
-/* reveals */
 const ro = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); }
-}), { rootMargin: "-50px" });
+}), { rootMargin: "-40px" });
 document.querySelectorAll(".reveal").forEach(el => ro.observe(el));
+document.querySelectorAll(".collection .film, .atelier .film").forEach(el => { el.classList.add("reveal"); ro.observe(el); });
 
-/* hover-to-play + click-for-sound */
 document.querySelectorAll(".film").forEach(card => {
   const v = card.querySelector("video");
   card.addEventListener("mouseenter", () => { v.muted = true; v.play().catch(()=>{}); });
   card.addEventListener("mouseleave", () => { if (v.muted) { v.pause(); v.currentTime = 0; } });
   card.addEventListener("click", () => {
-    document.querySelectorAll("video").forEach(o => { if (o !== v) { o.pause(); o.muted = true; } });
+    document.querySelectorAll(".film video").forEach(o => { if (o !== v) { o.pause(); o.muted = true; o.controls = false; } });
     if (v.muted) { v.muted = false; v.controls = true; v.play().catch(()=>{}); }
   });
 });
 
-/* lazy metadata */
 const vio = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.preload = "metadata"; vio.unobserve(e.target); }
 }), { rootMargin: "500px" });
-document.querySelectorAll("video").forEach(v => vio.observe(v));
+document.querySelectorAll(".film video").forEach(v => vio.observe(v));
 </script>
 
 </body>
