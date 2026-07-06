@@ -33,8 +33,10 @@ export const VolumetricLight: React.FC<{
   y?: number;
 }> = ({ primary, accent, intensity = 0.5, x = 50, y = 78 }) => {
   const frame = useCurrentFrame();
-  const breathe = 1 + Math.sin(frame / 55) * 0.08;
-  const driftX = Math.sin(frame / 140) * 4;
+  // 心跳禁令 (taste.md): 亮度只许恒定, 生命感交给位移漂移
+  const breathe = 1;
+  const driftX = Math.sin(frame / 140) * 6;
+  const driftY = Math.cos(frame / 180) * 4;
   const second = accent || primary;
   const a = (base: number) => alphaHex(base * intensity * breathe);
 
@@ -144,7 +146,7 @@ export const DriftParticles: React.FC<{
         const rate = 0.006 + hash(k + 5) * 0.008;
         const dx = Math.sin(frame * rate + phase) * 26;
         const dy = Math.cos(frame * rate * 0.8 + phase * 1.7) * 18;
-        const twinkle = 0.25 + 0.5 * (0.5 + 0.5 * Math.sin(frame * 0.02 + phase * 3));
+        const twinkle = 0.45; // 心跳禁令: 粒子不闪烁, 只漂移
 
         return (
           <div
