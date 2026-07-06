@@ -18,27 +18,11 @@
   body { background: var(--bg); color: var(--ink); font-family: Hellix, arial, sans-serif; -webkit-font-smoothing: antialiased; }
   a { color: inherit; }
 
-  /* ═══ hero — DIOR 实测复刻: 左半 800/1600 全高, 字幕 Atacama 32/-0.02em @86%, 链接 Hellix 500 14 ═══ */
-  .hero { position: relative; height: 100vh; background: var(--bg); }
-  .hero-media { position: absolute; left: 0; top: 0; width: 50%; height: 100%; overflow: hidden; background: #101010; }
-  .hero-media.right { left: 50%; background: #8a86a8; }
-  .hero-media.right video { filter: brightness(0.96) saturate(0.92); }
-  .hero-media video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(0.82) contrast(1.05); }
-  .wordmark {
-    position: absolute; left: 50%; top: 45.6%; transform: translate(-50%, -50%); z-index: 4;
-    font-family: "Atacama VAR", Georgia, serif; font-weight: 480; font-variation-settings: "opsz" 40;
-    font-size: 96px; letter-spacing: 0.18em; text-indent: 0.18em;
-    color: #fff; text-shadow: 0 2px 34px rgba(0,0,0,0.42); white-space: nowrap; opacity: 0; transition: opacity 1.8s ease .3s;
-  }
-  .wordmark.in { opacity: 1; }
-  @media (max-width: 900px) { .wordmark { font-size: 11vw; } }
-  .cap { position: absolute; z-index: 5; text-align: center; opacity: 0; transition: opacity 1.6s ease 1s; }
-  .cap.in { opacity: 1; }
-  .cap .t { font-family: "Atacama VAR", Georgia, serif; font-weight: 400; font-size: 32px; letter-spacing: -0.02em; }
-  .cap .s { display: inline-block; margin-top: 15px; font-family: Hellix, arial, sans-serif; font-weight: 500; font-size: 14px;
-    text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; cursor: pointer; }
-  .cap-l { left: 25%; bottom: 6.5%; transform: translateX(-50%); color: #fff; }
-  .cap-r { left: 75%; bottom: 6.5%; transform: translateX(-50%); color: #fff; text-shadow: 0 1px 16px rgba(0,0,0,0.35); transition-delay: 1.3s; }
+  .masthead { text-align: center; padding: 64px 20px 10px; }
+  .masthead .mk { font-family: "Atacama VAR", Georgia, serif; font-weight: 480; font-size: 44px; letter-spacing: 0.22em; text-indent: 0.22em; color: var(--ink); }
+  .masthead .ml { margin-top: 10px; font-family: Hellix, arial, sans-serif; font-weight: 400; font-size: 11px; letter-spacing: 0.34em; text-transform: uppercase; color: var(--mut); }
+  /* (hero removed) */
+  @media (max-width: 900px) { }
 
   /* ═══ PLP — DIOR 服装列表: 一排 3 个, 细缝, 紧凑 (linear 密度) ═══ */
   .plp-label { text-align: center; padding: 44px 16px 18px; font-family: Hellix, arial, sans-serif;
@@ -46,8 +30,8 @@
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 0 2px; }
   @media (max-width: 900px) { .grid3 { grid-template-columns: 1fr; } }
   .tile { position: relative; background: #101010; overflow: hidden; cursor: pointer; }
-  .tile video { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; filter: grayscale(0.9) brightness(0.9); transition: filter .8s ease; }
-  .tile:hover video, .tile.playing video { filter: none; }
+  .tile video { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  
   .tcap { text-align: center; padding: 14px 8px 30px; background: var(--bg); }
   .tcap .n { font-family: Hellix, arial, sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.02em; }
   .tcap .w { margin-top: 5px; font-family: Hellix, arial, sans-serif; font-weight: 400; font-size: 12px; color: var(--mut);
@@ -57,8 +41,8 @@
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 0 2px; }
   @media (max-width: 900px) { .row2 { grid-template-columns: 1fr; } }
   .push { position: relative; overflow: hidden; background: #101010; cursor: pointer; }
-  .push video { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; filter: grayscale(1) brightness(0.68); transition: filter .9s ease; }
-  .push:hover video, .push.playing video { filter: none; }
+  .push video { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; }
+  
   .pcap { position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); text-align: center; color: #fff; z-index: 3; pointer-events: none; }
   .pcap .t { font-family: "Atacama VAR", Georgia, serif; font-weight: 400; font-size: 32px; letter-spacing: -0.02em; text-shadow: 0 1px 18px rgba(0,0,0,0.35); white-space: nowrap; }
   .pcap .s { display: inline-block; margin-top: 15px; font-family: Hellix, arial, sans-serif; font-weight: 500; font-size: 14px;
@@ -80,19 +64,7 @@
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-media"><video autoplay muted loop playsinline src="hero.mp4"></video></div>
-  <div class="hero-media right"><video autoplay muted loop playsinline src="hero-right.mp4"></video></div>
-  <div class="wordmark" id="wm">30X</div>
-  <div class="cap cap-l" id="c1">
-    <div class="t">Web-to-Video Films</div>
-    <a class="s" href="#plp">Watch now</a>
-  </div>
-  <div class="cap cap-r" id="c2">
-    <div class="t">One URL in. A film out.</div>
-    <a class="s" href="#plp">Discover the films</a>
-  </div>
-</div>
+<div class="masthead"><div class="mk">30X</div><div class="ml">Web-to-Video Films</div></div>
 
 <main id="plp"></main>
 
@@ -102,12 +74,9 @@
 </footer>
 
 <script>
-setTimeout(() => document.getElementById("wm").classList.add("in"), 150);
-setTimeout(() => document.getElementById("c1").classList.add("in"), 500);
-setTimeout(() => document.getElementById("c2").classList.add("in"), 700);
 
 const GROUPS = [
-  { label: "Colour & Craft", films: [["05-mana","Maná"],["10-corgi","Corgi"],["06-cofounder","Cofounder"],["04-parker","Parker"],["16-daydream-v2","daydream"]] },
+  { label: "Colour & Craft", films: [["05-mana","Maná"],["10-corgi","Corgi"],["06-cofounder","Cofounder"],["04-parker","Parker"],["16-daydream-v2","daydream"],["15-dusty","Dusty & Co"]] },
   { label: "Paper & Ink", films: [["14-laper","Laper"],["11-orchid","Orchid"]] },
   { label: "Night & Light", films: [["12-therasun","TheraSun"],["01-happy-model","Happy Model"],["13-idensia","Idensia"]] },
   { label: "Quiet Luxury", films: [["07-jetpartners","JetPartners"],["02-caylent","Caylent"]] },
