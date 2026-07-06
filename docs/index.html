@@ -99,7 +99,7 @@ const tile = ([f, b]) => `
   <div class="tile" data-f="${f}">
     <video preload="none" poster="posters/${f}.jpg" playsinline loop muted src="films/${f}.mp4"></video>
   </div>`;
-const cap = ([f, b]) => `<div class="tcap"><div class="n">${b}</div><div class="w">Watch the film</div></div>`;
+const cap = ([f, b]) => `<div class="tcap" data-f="${f}" data-n="${b}"><div class="n">${b}</div><div class="w">Watch the film</div></div>`;
 
 const main = document.getElementById("plp");
 GROUPS.forEach(g => {
@@ -122,13 +122,13 @@ main.insertAdjacentHTML("beforeend", `
       <div class="push" data-f="15-dusty">
         <video preload="none" poster="posters/15-dusty.jpg" playsinline loop muted src="films/15-dusty.mp4"></video>
       </div>
-      <div class="tcap"><div class="n">Dusty &amp; Co — Take One</div><div class="w">Watch the film</div></div>
+      <div class="tcap" data-f="15-dusty" data-n="Dusty & Co — Take One"><div class="n">Dusty &amp; Co — Take One</div><div class="w">Watch the film</div></div>
     </div>
     <div>
       <div class="push" data-f="17-dusty-v2">
         <video preload="none" poster="posters/17-dusty-v2.jpg" playsinline loop muted src="films/17-dusty-v2.mp4"></video>
       </div>
-      <div class="tcap"><div class="n">Dusty &amp; Co — Take Two</div><div class="w">Watch the film</div></div>
+      <div class="tcap" data-f="17-dusty-v2" data-n="Dusty & Co — Take Two"><div class="n">Dusty &amp; Co — Take Two</div><div class="w">Watch the film</div></div>
     </div>
   </div>`);
 
@@ -156,24 +156,13 @@ document.querySelectorAll(".tile, .push").forEach(card => {
   const v = card.querySelector("video");
   card.addEventListener("mouseenter", () => { v.muted = true; v.play().catch(()=>{}); });
   card.addEventListener("mouseleave", () => { v.pause(); card.classList.remove("playing"); v.load(); });
-  card.addEventListener("click", () => {
-    const f = card.dataset.f;
-    const cap = card.closest("div").parentElement.querySelector(".tcap .n, .fcap .b");
-    openLB(f, (cap && cap.textContent) || "");
-  });
+  card.addEventListener("click", () => openLB(card.dataset.f, ""));
 });
 // Watch the film 链接也开灯箱
 document.querySelectorAll(".tcap").forEach(tc => {
-  const w = tc.querySelector(".w"); if (!w) return;
+  const w = tc.querySelector(".w"); if (!w || !tc.dataset.f) return;
   w.style.cursor = "pointer";
-  w.addEventListener("click", () => {
-    // 找同组前面的 tile/push
-    let el = tc.previousElementSibling;
-    if (!el || (!el.classList.contains("tile") && !el.classList.contains("push"))) {
-      el = tc.parentElement.querySelector(".tile, .push");
-    }
-    if (el) openLB(el.dataset.f, tc.querySelector(".n").textContent);
-  });
+  w.addEventListener("click", () => openLB(tc.dataset.f, tc.dataset.n || ""));
 });
 
 const vio = new IntersectionObserver(es => es.forEach(e => {
