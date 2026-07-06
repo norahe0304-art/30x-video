@@ -121,6 +121,7 @@ Read individual rule files for detailed explanations and code examples:
 - [rules/narration-sync.md](rules/narration-sync.md) - Voiceover/caption videos only: beat-lock visuals to whisper word timestamps, caption/brand-word cleanup, sentence-boundary cut snapping
 
 ### Strategy & Quality
+- [rules/creative-moves.md](rules/creative-moves.md) - Five creative generators distilled from every "惊艳" verdict — idiom-literalism, logo-geometry growth, constraint alchemy, semantic inversion, domain-native proof
 - [rules/taste.md](rules/taste.md) - AI slop blacklist, design principles, UX laws, self-review checklist, pacing
 - [rules/narrative.md](rules/narrative.md) - 5-act structure, headline/UI rhythm, story arc, logo constellation
 - [rules/narrative-templates.md](rules/narrative-templates.md) - Industry-specific narrative templates (AI SaaS, FinTech, DevTool, E-Commerce, Healthcare, Cybersecurity, Collaboration)
