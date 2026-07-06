@@ -56,3 +56,9 @@
 - ❌ 位图 logo 截图（模糊 + 不可染色）当官方 mark 用。
 
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
+
+
+## 品牌字体的两条硬判例 (DIOR 之夜 2026-07-05)
+
+1. **变量字体必须设实例轴**。variable font 加载后用默认轴渲染 ≠ 品牌字形(DIOR 的 Atacama VAR 默认 CNTR=0 渲成无衬线,官方实例 CNTR=70 才是真 Didone)。拿到 VF 后先查它的命名实例(named instances)或官网 computed `font-variation-settings`,在 CSS/fonts.ts 里显式设置;渲一帧对比字形验收,serif/对比度不对就是轴没设。
+2. **用户存档页是字体金矿**。浏览器"保存页面"的单文件 html 里 @font-face 常以 base64 data URI 内嵌品牌真字体——正则提取、解码落盘 `public/fonts/`、本地加载,即获 1:1 品牌字。比找"最像的 Google 字体"高一个量级。

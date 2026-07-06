@@ -1,6 +1,6 @@
 {
   "name": "30x-web-to-video",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "One URL in, an agency-grade launch video out. A Claude Code skill with a 16-law taste codex \u2014 14 brands, 14 worlds, zero templates.",
   "type": "module",
   "license": "MIT",
