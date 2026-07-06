@@ -62,3 +62,20 @@
 
 1. **变量字体必须设实例轴**。variable font 加载后用默认轴渲染 ≠ 品牌字形(DIOR 的 Atacama VAR 默认 CNTR=0 渲成无衬线,官方实例 CNTR=70 才是真 Didone)。拿到 VF 后先查它的命名实例(named instances)或官网 computed `font-variation-settings`,在 CSS/fonts.ts 里显式设置;渲一帧对比字形验收,serif/对比度不对就是轴没设。
 2. **用户存档页是字体金矿**。浏览器"保存页面"的单文件 html 里 @font-face 常以 base64 data URI 内嵌品牌真字体——正则提取、解码落盘 `public/fonts/`、本地加载,即获 1:1 品牌字。比找"最像的 Google 字体"高一个量级。
+
+
+## 侦探手册 — 素材找不到时去哪儿看 (全部真实战例)
+
+采收失败的九成不是"没有素材", 是没看对地方。按序排查:
+
+1. **页面 JSON 血包**: DOM 里 src 被剥/懒加载没触发时, 看 `__NEXT_DATA__` / `window.__NUXT__` / ld+json —— 里面常埋着完整媒体 ID 清单 (DIOR 案: 单文件快照 src 全空, `__NEXT_DATA__` 里躺着 103 个官方 CDN 媒体 ID, 直连全 200)。
+2. **壳站穿透**: 输入 URL 是平台托管页 (预览站/护照页/目录站) 时, 先判定真主体。铁证 = **资产命名空间分家**: 品牌内容在用户上传桶 (如 s3 用户目录), 平台 UI 资产在平台自己的路径 —— 两个域名/路径系统一分, 主体立现 (Cofounder 案: mobbin 壳; Dusty 案: idensia 护照)。平台元素一律隔离, 不入片。
+3. **文件名都在撒谎**: `logo.png` 可能是 32px 的 .ico, `product-ui.png` 可能是 1×1 追踪像素或字标副本, `hero.png` 可能是带烘焙标语的 og 图。**逐个读字节和像素**再定用途, 文件名只是线索不是结论。
+4. **懒加载要真滚动**: playwright 长图中段大片空白 = lazy-load 未触发 → 换真浏览器 (chrome-devtools/claude-in-chrome) 滚动到位再采 (Orchid 案: 官网中段 4 屏全空, 真滚后全是金矿)。
+5. **模糊素材先想"重采"**: 库存截图 1280 宽放大必糊 → playwright `--viewport-size=1920,1080` + `deviceScaleFactor: 2` 重截, 一次到位 (Laper/Parker 案)。
+6. **用户存档页是宝库**: 浏览器"保存页面"的 html 内嵌 @font-face base64 真字体、verbatim 文案、结构化数据 —— 用户丢给你的快照永远先解剖一遍。
+7. **官方 demo 片逐帧摸底**: 全片抽帧做 contact sheet, 标出字卡区间与干净窗口的**精确秒数** (像素级验边界), 字卡段禁全屏; 它的美术方向本身就是品牌真理, 可以学气质不搬画面。
+8. **变量字体查实例轴**: VF 默认轴 ≠ 品牌字形, 找 named instances 或官网 computed `font-variation-settings` (DIOR 案: CNTR 0→70 才从 grotesque 变回 Didone)。
+9. **403 只是第一道门**: orchestrator 被拦 → headless Chromium 被拦 → **用户的真 Chrome** (claude-in-chrome) 几乎总能进; 进去后优先直连 CDN 而不是截屏。
+
+纪律: 每条侦探所得依然过 Gate 1 逐张 Read + 台账溯源; 侦探不豁免审计。
