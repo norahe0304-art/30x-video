@@ -99,12 +99,16 @@ if (!flags.has("--no-harvest")) {
 }
 
 // ── 3) hand off to the agent ─────────────────────────────────────────────
-const prompt = `用 30x-web-to-video skill 完成 ${outDir} 的 launch video：先读 SKILL.md 与 rules/（尤其 artifact-catalog 选型优先级、taste、typography、narration-sync），Gate 1 逐张审计素材，然后设计五幕、配音配乐、每幕渲证据帧自检，最后开 remotion studio 给我预览。`;
+// --no-harvest skips the scaffold step above, so outDir is never actually
+// created — point the user at the directory that really got touched
+// (the one the skill was just installed into) instead of a phantom path.
+const projectDir = flags.has("--no-harvest") ? process.cwd() : outDir;
+const prompt = `用 30x-web-to-video skill 完成 ${projectDir} 的 launch video：先读 SKILL.md 与 rules/（尤其 artifact-catalog 选型优先级、taste、typography、narration-sync），Gate 1 逐张审计素材，然后设计五幕、配音配乐、每幕渲证据帧自检，最后开 remotion studio 给我预览。`;
 
 const hasClaude = spawnSync("claude", ["--version"], { stdio: "ignore" }).status === 0;
 if (flags.has("--agent") && hasClaude) {
   console.log("\n🤖 handing off to Claude Code…\n");
-  const a = spawnSync("claude", [prompt], { stdio: "inherit", cwd: outDir });
+  const a = spawnSync("claude", [prompt], { stdio: "inherit", cwd: projectDir });
   process.exit(a.status ?? 0);
 }
 
@@ -112,7 +116,7 @@ console.log(`
 ── next step ────────────────────────────────────────────────
 ${hasClaude ? "Run:" : "Install Claude Code (https://claude.com/claude-code), then run:"}
 
-  cd ${outDir}
+  cd ${projectDir}
   claude "${prompt.replace(/"/g, '\\"')}"
 
 (or re-run with --agent to launch it automatically)
