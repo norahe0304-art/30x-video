@@ -49,9 +49,10 @@ Optional: ELEVENLABS_API_KEY in the project .env for premium narration
 (falls back to Kokoro local TTS — zero keys needed).
 `;
 
-if (flags.has("--help") || flags.has("-h") || (!url && !flags.has("--global"))) {
+const helpRequested = flags.has("--help") || flags.has("-h");
+if (helpRequested || (!url && !flags.has("--global"))) {
   console.log(HELP.trim());
-  process.exit(url || flags.has("--global") ? 0 : 1);
+  process.exit(helpRequested || url || flags.has("--global") ? 0 : 1);
 }
 
 const slug = (() => {
