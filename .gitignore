@@ -18,6 +18,8 @@ output/
 .cache/
 .npm/
 tmp/
+__pycache__/
+*.pyc
 
 # IDE
 .vscode/

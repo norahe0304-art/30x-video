@@ -1,12 +1,12 @@
 ---
-name: remotion-beautiful-videos
+name: 30x-web-to-video
 description: Use when a user gives a brand URL and wants a premium launch, demo, or marketing video. Zero-manual workflow — Claude runs the V2 orchestrator itself (scrapes brand evidence, auto-installs missing tools, generates the first-cut Remotion project). User only sees the URL and the Studio preview.
 ---
 
 <!--
 [INPUT]: Brand URL or name, real site assets, user-approved story intent, rules/ + references/ + scaffold/
 [OUTPUT]: A Claude Code workflow for building premium brand-faithful Remotion launch videos, guarded by four evidence-based QC gates (asset audit / per-act frame evidence / critic loop / honest disclosure)
-[POS]: remotion-video-skill 的主入口; 协调现象层抓取、本质层 archetype、证据层 qc-gates、哲学层 finish gate 与最终 scaffold 执行
+[POS]: 30x-web-to-video 的主入口; 协调现象层抓取、本质层 archetype、证据层 qc-gates、哲学层 finish gate 与最终 scaffold 执行
 [PROTOCOL]: 变更时更新此头部，然后检查 AGENTS.md
 -->
 

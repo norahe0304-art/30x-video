@@ -6,7 +6,7 @@
  *   project via the bundled orchestrator.
  * Stage 2 (agentic taste): install the bundled skill into the project's
  *   .claude/skills/ and hand off to Claude Code, which designs the five
- *   acts under the battle-tested rules (10-brand validated codex).
+ *   acts under the battle-tested rules (12-brand validated codex).
  */
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync } from "node:fs";

@@ -1,5 +1,5 @@
-# remotion-video-skill/
-> L2 | 父级: ../AGENTS.md
+# 30x-web-to-video/
+> L2 | 独立发布仓库内的 skill 包，无外部父级 AGENTS.md
 
 Claude Code 原生 skill。主链保持 `SKILL.md -> rules -> scaffold -> scripts`，V2 额外加入 `benchmarks/` 作为稳定评测面。外部设计资料只允许增强判断，不允许取代真实品牌证据或现有生产经验。
 
